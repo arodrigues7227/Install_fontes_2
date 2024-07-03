@@ -23,7 +23,7 @@ const Copyright = () => {
 			{"Copyright "}
  			<Link color="primary" href="#">
  				{ nomeEmpresa } - v { versionSystem }
- 			</Link>{" "}
+ 			</Link>{"https://level10tech.com.br"}
  			{new Date().getFullYear()}
  			{"."}
  		</Typography>
