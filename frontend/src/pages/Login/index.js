@@ -19,7 +19,7 @@ import logo from "../../assets/logo.png";
 
 const Copyright = () => {
 	return (
-		<Typography variant="body2" color="primary" align="center">
+		<Typography variant="body2" color="#000000" align="center">
 			{"Copyright "}
  			<Link color="#000000" href="https://level10tech.com.br/">
  				{ nomeEmpresa } - v { versionSystem }
