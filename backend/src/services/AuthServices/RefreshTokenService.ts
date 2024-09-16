@@ -9,6 +9,7 @@ import {
   createAccessToken,
   createRefreshToken
 } from "../../helpers/CreateTokens";
+import UpdateUserNoQueue from "../UserServices/UpdateUserNoQueue";
 
 interface RefreshTokenPayload {
   id: string;
@@ -29,16 +30,16 @@ export const RefreshTokenService = async (
   try {
     const decoded = verify(token, authConfig.refreshSecret);
     const { id, tokenVersion, companyId } = decoded as RefreshTokenPayload;
-
     const user = await ShowUserService(id);
+    await UpdateUserNoQueue({ user, userData:{lastPresence: new Date()}})
 
     if (user.tokenVersion !== tokenVersion) {
       res.clearCookie("jrt");
       throw new AppError("ERR_SESSION_EXPIRED", 401);
     }
 
-    const newToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const newToken = createAccessToken(user, user.tokenVersion);
+    const refreshToken = createRefreshToken(user, user.tokenVersion);
 
     return { user, newToken, refreshToken };
   } catch (err) {

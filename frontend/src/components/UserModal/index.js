@@ -20,8 +20,8 @@ import {
 	IconButton,
 	Switch,
 	FormControlLabel
-  } from '@material-ui/core';
-  
+} from '@material-ui/core';
+
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -82,7 +82,8 @@ const UserModal = ({ open, onClose, userId }) => {
 		email: "",
 		password: "",
 		profile: "user",
-		allTicket: "desabled"
+		allTicket: "desabled",
+		canDeleteTicket: false
 	};
 
 	const { user: loggedInUser } = useContext(AuthContext);
@@ -95,22 +96,27 @@ const UserModal = ({ open, onClose, userId }) => {
 
 
 	useEffect(() => {
-		const fetchUser = async () => {
-			if (!userId) return;
-			try {
-				const { data } = await api.get(`/users/${userId}`);
-				setUser(prevState => {
-					return { ...prevState, ...data };
-				});
-				const userQueueIds = data.queues?.map(queue => queue.id);
-				setSelectedQueueIds(userQueueIds);
-				setWhatsappId(data.whatsappId ? data.whatsappId : '');
-			} catch (err) {
-				toastError(err);
-			}
-		};
+		if (open) {
+			const fetchUser = async () => {
+				if (!userId) return;
+				try {
+					const { data } = await api.get(`/users/${userId}`);
+					console.log(JSON.stringify(data, null, 2));
+					setUser(prevState => {
+						return { ...prevState, ...data };
+					});
+					const userQueueIds = data.queues?.map(queue => queue.id);
+					setSelectedQueueIds(userQueueIds);
+					setWhatsappId(data.whatsappId ? data.whatsappId : '');
+				} catch (err) {
+					toastError(err);
+				}
+			};
 
-		fetchUser();
+			fetchUser();
+
+		}
+
 	}, [userId, open]);
 
 	const handleClose = () => {
@@ -119,7 +125,8 @@ const UserModal = ({ open, onClose, userId }) => {
 	};
 
 	const handleSaveUser = async values => {
-		const userData = { ...values, whatsappId, queueIds: selectedQueueIds, allTicket: values.allTicket };
+		const userData = { ...values, whatsappId, queueIds: selectedQueueIds, allTicket: values.allTicket, canDeleteTicket: values.canDeleteTicket };
+		console.log(JSON.stringify(userData, null, 2));
 		try {
 			if (userId) {
 				await api.put(`/users/${userId}`, userData);
@@ -184,16 +191,16 @@ const UserModal = ({ open, onClose, userId }) => {
 										helperText={touched.password && errors.password}
 										type={showPassword ? 'text' : 'password'}
 										InputProps={{
-										endAdornment: (
-											<InputAdornment position="end">
-											<IconButton
-												aria-label="toggle password visibility"
-												onClick={() => setShowPassword((e) => !e)}
-											>
-												{showPassword ? <VisibilityOff /> : <Visibility />}
-											</IconButton>
-											</InputAdornment>
-										)
+											endAdornment: (
+												<InputAdornment position="end">
+													<IconButton
+														aria-label="toggle password visibility"
+														onClick={() => setShowPassword((e) => !e)}
+													>
+														{showPassword ? <VisibilityOff /> : <Visibility />}
+													</IconButton>
+												</InputAdornment>
+											)
 										}}
 									/>
 								</div>
@@ -270,7 +277,7 @@ const UserModal = ({ open, onClose, userId }) => {
 											</Field>
 										</FormControl>
 									)}
-								/>										
+								/>
 								<Can
 									role={loggedInUser.profile}
 									perform="user-modal:editProfile"
@@ -304,7 +311,40 @@ const UserModal = ({ open, onClose, userId }) => {
 
 									)}
 								/>
-								
+								<Can
+									role={loggedInUser.profile}
+									perform="user-modal:editProfile"
+									yes={() => (!loading &&
+										<div className={classes.textField}>
+											<FormControl
+												variant="outlined"
+												className={classes.maxWidth}
+												margin="dense"
+												fullWidth
+											>
+												<>
+													<InputLabel id="profile-selection-input-label">
+														{i18n.t("userModal.form.canDeleteTicket")}
+													</InputLabel>
+
+													<Field
+														as={Select}
+														label={i18n.t("userModal.form.canDeleteTicket")}
+														name="canDeleteTicket"
+														labelId="canDeleteTicket-selection-label"
+														id="canDeleteTicket-selection"
+														required
+													>
+														<MenuItem value={true}>{i18n.t("userModal.form.canDeleteTicketEnabled")}</MenuItem>
+														<MenuItem value={false}>{i18n.t("userModal.form.canDeleteTicketDesabled")}</MenuItem>
+													</Field>
+												</>
+											</FormControl>
+										</div>
+
+									)}
+								/>
+
 							</DialogContent>
 							<DialogActions>
 								<Button

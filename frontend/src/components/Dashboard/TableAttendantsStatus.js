@@ -17,22 +17,23 @@ import ErrorIcon from '@material-ui/icons/Error';
 import moment from 'moment';
 
 import Rating from '@material-ui/lab/Rating';
+import { RenderStatus } from "./RenderStatus";
 
 const useStyles = makeStyles(theme => ({
-	on: {
-		color: green[600],
-		fontSize: '20px'
-	},
-	off: {
-		color: red[600],
-		fontSize: '20px'
-	},
+    on: {
+        color: green[600],
+        fontSize: '20px'
+    },
+    off: {
+        color: red[600],
+        fontSize: '20px'
+    },
     pointer: {
         cursor: "pointer"
     }
 }));
 
-export function RatingBox ({ rating }) {
+export function RatingBox({ rating }) {
     const ratingTrunc = rating === null ? 0 : Math.trunc(rating);
     return <Rating
         defaultValue={ratingTrunc}
@@ -43,9 +44,9 @@ export function RatingBox ({ rating }) {
 
 export default function TableAttendantsStatus(props) {
     const { loading, attendants } = props
-	const classes = useStyles();
+    const classes = useStyles();
 
-    function renderList () {
+    function renderList() {
         return attendants.map((a, k) => (
             <TableRow key={k}>
                 <TableCell>{a.name}</TableCell>
@@ -54,20 +55,18 @@ export default function TableAttendantsStatus(props) {
                 </TableCell>
                 <TableCell align="center">{formatTime(a.avgSupportTime, 2)}</TableCell>
                 <TableCell align="center">
-                    { a.online ?
-                        <CheckCircleIcon className={classes.on} />
-                        : <ErrorIcon className={classes.off} />
-                    }
+                    <RenderStatus user={a} />
                 </TableCell>
+
             </TableRow>
         ))
     }
 
-	function formatTime(minutes){
-		return moment().startOf('day').add(minutes, 'minutes').format('HH[h] mm[m]');
-	}
+    function formatTime(minutes) {
+        return moment().startOf('day').add(minutes, 'minutes').format('HH[h] mm[m]');
+    }
 
-    return ( !loading ?
+    return (!loading ?
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>
@@ -79,7 +78,7 @@ export default function TableAttendantsStatus(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    { renderList() }
+                    {renderList()}
                     {/* <TableRow>
                         <TableCell>Nome 4</TableCell>
                         <TableCell align="center">10</TableCell>

@@ -28,6 +28,8 @@ const ListMessagesService = async ({
 }: Request): Promise<Response> => {
   const ticket = await ShowTicketService(ticketId, companyId);
 
+
+
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);
   }
@@ -43,6 +45,8 @@ const ListMessagesService = async ({
     }
   };
 
+
+  console.log("queues", JSON.stringify(queues, null, 2));
   if (queues.length > 0) {
     options.where["queueId"] = {
       [Op.or]: {
@@ -72,6 +76,7 @@ const ListMessagesService = async ({
   });
 
   const hasMore = count > offset + messages.length;
+  
 
   return {
     messages: messages.reverse(),

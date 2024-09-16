@@ -7,6 +7,7 @@ import { SendRefreshToken } from "../helpers/SendRefreshToken";
 import { RefreshTokenService } from "../services/AuthServices/RefreshTokenService";
 import FindUserFromToken from "../services/AuthServices/FindUserFromToken";
 import User from "../models/User";
+import UpdateUserNoQueue from "../services/UserServices/UpdateUserNoQueue";
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
   const { email, password } = req.body;
@@ -17,6 +18,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   });
 
   SendRefreshToken(res, refreshToken);
+  
 
   const io = getIO();
   io.to(`user-${serializedUser.id}`).emit(`company-${serializedUser.companyId}-auth`, {
@@ -72,7 +74,7 @@ export const remove = async (
 ): Promise<Response> => {
   const { id } = req.user;
   const user = await User.findByPk(id);
-  await user.update({ online: false });
+  await UpdateUserNoQueue({ user, userData: { tokenVersion: 0 } })
 
   res.clearCookie("jrt");
 

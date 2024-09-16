@@ -30,6 +30,9 @@ import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { SocketContext } from "../../context/Socket/SocketContext";
+import moment from "moment";
+import { RenderUserStatus } from "./RenderUserStatus";
+import DateDisplay from "../../components/DateDisplay";
 
 
 
@@ -193,8 +196,7 @@ const Users = () => {
       <ConfirmationModal
         title={
           deletingUser &&
-          `${i18n.t("users.confirmationModal.deleteTitle")} ${
-            deletingUser.name
+          `${i18n.t("users.confirmationModal.deleteTitle")} ${deletingUser.name
           }?`
         }
         open={confirmModalOpen}
@@ -242,10 +244,11 @@ const Users = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-			<TableCell align="center">
+              <TableCell align="center">
                 {i18n.t("users.table.id")}
               </TableCell>
               <TableCell align="center">{i18n.t("users.table.status")}</TableCell>
+              <TableCell align="center">{i18n.t("users.table.lastPresence")}</TableCell>
               <TableCell align="center">{i18n.t("users.table.name")}</TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.email")}
@@ -262,8 +265,9 @@ const Users = () => {
             <>
               {users.map((user) => (
                 <TableRow key={user.id}>
-				  <TableCell align="center">{user.id}</TableCell>
-				  <TableCell align="center"><UserStatusIcon user={user} /></TableCell>
+                  <TableCell align="center">{user.id}</TableCell>
+                  <TableCell align="center"><RenderUserStatus userStatus={user.userStatus} /></TableCell>
+                  <TableCell align="center"><DateDisplay  date={user.updatedAt} /></TableCell>
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>

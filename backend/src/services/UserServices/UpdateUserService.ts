@@ -14,6 +14,7 @@ interface UserData {
   queueIds?: number[];
   whatsappId?: number;
   allTicket?: string;
+  canDeleteTicket?: boolean;
 }
 
 interface Request {
@@ -49,13 +50,13 @@ const UpdateUserService = async ({
     email: Yup.string().email(),
     profile: Yup.string(),
     password: Yup.string(),
-	allTicket: Yup.string()
+    allTicket: Yup.string()
   });
 
-  const { email, password, profile, name, queueIds = [], whatsappId, allTicket } = userData;
+  const { email, password, profile, name, queueIds = [], whatsappId, allTicket, canDeleteTicket } = userData;
 
   try {
-    await schema.validate({ email, password, profile, name, allTicket });
+    await schema.validate({ email, password, profile, name, allTicket, canDeleteTicket });
   } catch (err: any) {
     throw new AppError(err.message);
   }
@@ -66,24 +67,17 @@ const UpdateUserService = async ({
     profile,
     name,
     whatsappId: whatsappId || null,
-	allTicket
+    allTicket,
+    canDeleteTicket
   });
 
   await user.$set("queues", queueIds);
 
   await user.reload();
 
-  const company = await Company.findByPk(user.companyId);
 
-  const serializedUser = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    profile: user.profile,
-    companyId: user.companyId,
-    company,
-    queues: user.queues
-  };
+
+  const serializedUser = await ShowUserService(user.id);
 
   return serializedUser;
 };

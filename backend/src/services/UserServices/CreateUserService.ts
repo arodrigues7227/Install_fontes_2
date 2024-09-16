@@ -5,6 +5,7 @@ import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 import Plan from "../../models/Plan";
 import Company from "../../models/Company";
+import ShowUserService from "./ShowUserService";
 
 interface Request {
   email: string;
@@ -15,6 +16,7 @@ interface Request {
   profile?: string;
   whatsappId?: number;
   allTicket?:string;
+  canDeleteTicket?: boolean;
 }
 
 interface Response {
@@ -32,7 +34,8 @@ const CreateUserService = async ({
   companyId,
   profile = "admin",
   whatsappId,
-  allTicket
+  allTicket,
+  canDeleteTicket
 }: Request): Promise<Response> => {
   if (companyId !== undefined) {
     const company = await Company.findOne({
@@ -90,7 +93,8 @@ const CreateUserService = async ({
       companyId,
       profile,
       whatsappId: whatsappId || null,
-	  allTicket
+	  allTicket,
+	  canDeleteTicket
     },
     { include: ["queues", "company"] }
   );
@@ -99,7 +103,7 @@ const CreateUserService = async ({
 
   await user.reload();
 
-  const serializedUser = SerializeUser(user);
+  const serializedUser = await ShowUserService(user.id);
 
   return serializedUser;
 };

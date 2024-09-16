@@ -15,9 +15,8 @@ import { verifyMessage } from "../WbotServices/wbotMessageListener";
 import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne"; //NOVO PLW DESIGN//
 import ShowUserService from "../UserServices/ShowUserService"; //NOVO PLW DESIGN//
 import { isNil } from "lodash";
-import Whatsapp from "../../models/Whatsapp";
-import { Op } from "sequelize";
-import AppError from "../../errors/AppError";
+import Message from "../../models/Message";
+import { map_msg } from "../../utils/global";
 
 interface TicketData {
   status?: string;
@@ -55,11 +54,9 @@ const UpdateTicketService = async ({
     let { queueId, userId, whatsappId, lastMessage = null } = ticketData;
     let chatbot: boolean | null = ticketData.chatbot || false;
     let queueOptionId: number | null = ticketData.queueOptionId || null;
-    let promptId: number | null = ticketData.promptId || null;
-    let useIntegration: boolean | null = ticketData.useIntegration || false;
-    let integrationId: number | null = ticketData.integrationId || null;
 
-    console.log("ticketData", ticketData);
+
+    
 
     const io = getIO();
 
@@ -74,6 +71,7 @@ const UpdateTicketService = async ({
 
 
     const ticket = await ShowTicketService(ticketId, companyId);
+    map_msg.delete(ticket.contact.number);
     const ticketTraking = await FindOrCreateATicketTrakingService({
       ticketId,
       companyId,
@@ -91,25 +89,7 @@ const UpdateTicketService = async ({
     const oldQueueId = ticket.queueId;
 
     if (oldStatus === "closed" || Number(whatsappId) !== ticket.whatsappId) {
-      // let otherTicket = await Ticket.findOne({
-      //   where: {
-      //     contactId: ticket.contactId,
-      //     status: { [Op.or]: ["open", "pending", "group"] },
-      //     whatsappId
-      //   }
-      // });
-      // if (otherTicket) {
-      //     otherTicket = await ShowTicketService(otherTicket.id, companyId)
 
-      //     await ticket.update({status: "closed"})
-
-      //     io.to(oldStatus).emit(`company-${companyId}-ticket`, {
-      //       action: "delete",
-      //       ticketId: ticket.id
-      //     });
-
-      //     return { ticket: otherTicket, oldStatus, oldUserId }
-      // }
       await CheckContactOpenTickets(ticket.contact.id, whatsappId);
       chatbot = null;
       queueOptionId = null;
@@ -121,12 +101,13 @@ const UpdateTicketService = async ({
         companyId
       );
 
-      if (setting?.value === "enabled") {
+      console.log("oldStatus >>>", oldStatus);
+      if (setting?.value === "enabled" && oldStatus === "open") {
         if (ticketTraking.ratingAt == null) {
           const ratingTxt = ratingMessage || "";
           let bodyRatingMessage = `\u200e${ratingTxt}\n\n`;
           bodyRatingMessage +=
-            "Digite de 1 à 3 para qualificar nosso atendimento:\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_\n\n";
+            "Digite de 1 à 3 para qualificar nosso atendimento:\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_\n*4* - _Não desejo qualificar_\n\n";
           await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
 
           await ticketTraking.update({
@@ -235,6 +216,18 @@ const UpdateTicketService = async ({
               await verifyMessage(queueChangedMessage, ticket, ticket.contact);
             }      
     }
+
+    if(oldQueueId !== queueId){
+      await Message.update({
+        queueId: queueId
+      }, {
+        where: {
+          ticketId: ticket.id,
+          queueId: oldQueueId
+        }
+      })
+    }
+
 
     await ticket.update({
       status,

@@ -43,6 +43,8 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
     }
   };
 
+
+
   const io = getIO();
   try {
 
@@ -51,9 +53,13 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
       order: [["updatedAt", "DESC"]]
     });
 
+    console.log("Runnning wbotClosedTickets", moment().format("DD/MM/YYYY HH:mm:ss"))
+    console.log('tickets', JSON.stringify(tickets, null, 2))
+
     tickets.forEach(async ticket => {
       const showTicket = await ShowTicketService(ticket.id, companyId);
       const whatsapp = await Whatsapp.findByPk(showTicket?.whatsappId);
+      console.log('whatsapp', JSON.stringify(whatsapp, null, 2))
       const ticketTraking = await TicketTraking.findOne({
         where: {
           ticketId: ticket.id,
@@ -69,46 +75,75 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
       } = whatsapp
 
 
-      // @ts-ignore: Unreachable code error
-      if (expiresTicket && expiresTicket !== "" &&
-        // @ts-ignore: Unreachable code error
-        expiresTicket !== "0" && Number(expiresTicket) > 0) {
+      if (ticketTraking?.ratingAt && moment(ticketTraking.ratingAt).isBefore(moment().subtract(2, 'minutes'))) {
 
-        //mensagem de encerramento por inatividade
-        const bodyExpiresMessageInactive = formatBody(`\u200e ${expiresInactiveMessage}`, showTicket.contact);
+        const sentMessage = await SendWhatsAppMessage({ body: whatsapp.complationMessage, ticket: showTicket });
 
-        const dataLimite = new Date()
-        dataLimite.setMinutes(dataLimite.getMinutes() - Number(expiresTicket));
+        await verifyMessage(sentMessage, showTicket, showTicket.contact);
 
-        if (showTicket.status === "open" && !showTicket.isGroup) {
+        await ticketTraking.update({
+          finishedAt: moment().toDate(),
+          closedAt: moment().toDate(),
+          whatsappId: ticket.whatsappId,
+          userId: ticket.userId,
+        })
 
-          const dataUltimaInteracaoChamado = new Date(showTicket.updatedAt)
+        setTimeout(async () => {
+          await closeTicket(showTicket, showTicket.status, whatsapp.complationMessage);
+        }, 2500)
 
-          if (dataUltimaInteracaoChamado < dataLimite && showTicket.fromMe) {
+      } else {
+        const expiresTicketNumber = Number(expiresTicket);
+        if (expiresTicketNumber > 0) {
+          //mensagem de encerramento por inatividade
+          console.log('expiresInactiveMessage', expiresInactiveMessage)
+          const bodyExpiresMessageInactive = formatBody(`\u200e ${expiresInactiveMessage}`, showTicket.contact);
 
-            closeTicket(showTicket, showTicket.status, bodyExpiresMessageInactive);
+          const dataLimite = new Date()
+          dataLimite.setMinutes(dataLimite.getMinutes() - expiresTicketNumber);
 
-            if (expiresInactiveMessage !== "" && expiresInactiveMessage !== undefined) {
-              const sentMessage = await SendWhatsAppMessage({ body: bodyExpiresMessageInactive, ticket: showTicket });
+          if (showTicket.status === "open" && !showTicket.isGroup) {
 
-              await verifyMessage(sentMessage, showTicket, showTicket.contact);
+            const dataUltimaInteracaoChamado = new Date(showTicket.updatedAt)
+
+            if (dataUltimaInteracaoChamado < dataLimite && showTicket.fromMe) {
+
+
+
+              if (expiresInactiveMessage !== "" && expiresInactiveMessage !== undefined) {
+                const sentMessage = await SendWhatsAppMessage({ body: bodyExpiresMessageInactive, ticket: showTicket });
+
+                await verifyMessage(sentMessage, showTicket, showTicket.contact);
+              }
+
+              await ticketTraking.update({
+                finishedAt: moment().toDate(),
+                closedAt: moment().toDate(),
+                whatsappId: ticket.whatsappId,
+                userId: ticket.userId,
+              })
+
+              setTimeout(async () => {
+                await closeTicket(showTicket, showTicket.status, whatsapp.complationMessage);
+                io.to(`company-${companyId}-${"open"}`)
+                .to(`queue-${ticket.queueId}-${"open"}`)
+                .to(`user-${ticket.userId}`)
+                .emit(`company-${companyId}-ticket`, {
+                  action: "delete",
+                  ticketId: ticket.id
+                });
+                  }, 2500)
+
+
+
             }
-
-            await ticketTraking.update({
-              finishedAt: moment().toDate(),
-              closedAt: moment().toDate(),
-              whatsappId: ticket.whatsappId,
-              userId: ticket.userId,
-            })
-
-            io.to("open").emit(`company-${companyId}-ticket`, {
-              action: "delete",
-              ticketId: showTicket.id
-            });
-
           }
         }
       }
+
+
+      // @ts-ignore: Unreachable code error
+
     });
 
   } catch (e: any) {

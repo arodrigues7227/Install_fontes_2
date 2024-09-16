@@ -53,7 +53,7 @@ interface DispatchCampaignData {
   contactListItemId: number;
 }
 
-export const userMonitor = new BullQueue("UserMonitor", connection);
+/* export const userMonitor = new BullQueue("UserMonitor", connection); */
 
 export const queueMonitor = new BullQueue("QueueMonitor", connection);
 
@@ -777,7 +777,7 @@ async function handleDispatchCampaign(job) {
   }
 }
 
-async function handleLoginStatus(job) {
+/* async function handleLoginStatus(job) {
   const users: { id: number }[] = await sequelize.query(
     `select id from "Users" where "updatedAt" < now() - '5 minutes'::interval and online = true`,
     { type: QueryTypes.SELECT }
@@ -791,7 +791,7 @@ async function handleLoginStatus(job) {
       Sentry.captureException(e);
     }
   }
-}
+} */
 
 
 async function handleInvoiceCreate() {
@@ -890,7 +890,7 @@ export async function startQueueProcess() {
 
   campaignQueue.process("DispatchCampaign", handleDispatchCampaign);
 
-  userMonitor.process("VerifyLoginStatus", handleLoginStatus);
+  //userMonitor.process("VerifyLoginStatus", handleLoginStatus);
 
   //queueMonitor.process("VerifyQueueStatus", handleVerifyQueue);
 
@@ -914,14 +914,14 @@ export async function startQueueProcess() {
     }
   );
 
-  userMonitor.add(
+/*   userMonitor.add(
     "VerifyLoginStatus",
     {},
     {
       repeat: { cron: "* * * * *", key: "verify-login" },
       removeOnComplete: true
     }
-  );
+  ); */
 
   queueMonitor.add(
     "VerifyQueueStatus",

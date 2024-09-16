@@ -22,6 +22,7 @@ import UserQueue from "./UserQueue";
 import Company from "./Company";
 import QuickMessage from "./QuickMessage";
 import Whatsapp from "./Whatsapp";
+import { convertForHours } from "../helpers/ConvertFouHours";
 
 @Table
 class User extends Model<User> {
@@ -35,7 +36,10 @@ class User extends Model<User> {
 
   @Column
   email: string;
-  
+
+  @Column
+  canDeleteTicket: boolean;
+
   @Column
   allTicket: string;
 
@@ -58,6 +62,9 @@ class User extends Model<User> {
 
   @Column
   online: boolean;
+
+    @Column
+  lastPresence: Date;
 
   @CreatedAt
   createdAt: Date;
@@ -91,6 +98,26 @@ class User extends Model<User> {
 
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
+
+  @Column(DataType.VIRTUAL)
+  get userStatus(): string | null {
+    if (this.getDataValue("tokenVersion") === 0) {
+      return "offline"
+    } else
+      if (this.getDataValue("lastPresence")) {
+        let st = "offline"
+        let sTime = new Date().getTime() - new Date(this.getDataValue("lastPresence")).getTime()
+        let time = 1000 * 60 * 10 // se o a ultima confirmação de presença é 10 minutos atrás marca como online
+        if (sTime < time) {
+          st = "online"
+        }
+        else {
+          st = "offline a " + convertForHours(sTime)
+        }
+        return st
+      }
+    return "offline"
+  }
 
   @BeforeUpdate
   @BeforeCreate

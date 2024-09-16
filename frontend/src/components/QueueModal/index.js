@@ -85,7 +85,7 @@ const QueueModal = ({ open, onClose, queueId }) => {
     name: "",
     color: "",
     greetingMessage: "",
-    outOfHoursMessage: "",
+    outOfHoursMessage: "Estamos fora do horário de expediente, assim que possível retornaremos o contato.",
     orderQueue: "",
     integrationId: "",
     promptId: ""

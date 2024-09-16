@@ -13,6 +13,7 @@ import { ForwardMessageContext } from "../../context/ForwarMessage/ForwardMessag
 import ForwardModal from "../../components/ForwardMessageModal";
 import {toast} from "react-toastify";
 import toastError from "../../errors/toastError";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
 	iconButton: {
@@ -63,6 +64,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 		selectedMessages,
 		forwardMessageModalOpen,
 		setForwardMessageModalOpen } = useContext(ForwardMessageContext);
+	const { user } = useContext(AuthContext);
 		
 
 	const handleDeleteMessage = async () => {
@@ -193,7 +195,7 @@ const MessageOptionsMenu = ({ message, menuOpen, handleClose, anchorEl }) => {
 					</MenuItem>
 				)}
 				{message.fromMe && (
-					<MenuItem onClick={handleOpenConfirmationModal}>
+					<MenuItem disabled={!user?.canDeleteTicket} onClick={handleOpenConfirmationModal}>
 						{i18n.t("messageOptionsMenu.delete")}
 					</MenuItem>
 				)}

@@ -35,7 +35,7 @@ const FindOrCreateTicketService = async (
   if (ticket) {
     await ticket.update({ unreadMessages, whatsappId });
   }
-  
+
   if (ticket?.status === "closed") {
     await ticket.update({ queueId: null, userId: null });
   }
@@ -66,7 +66,7 @@ const FindOrCreateTicketService = async (
     const msgIsGroupBlock = await Setting.findOne({
       where: { key: "timeCreateNewTicket" }
     });
-  
+
     const value = msgIsGroupBlock ? parseInt(msgIsGroupBlock.value, 10) : 7200;
   }
 
@@ -97,27 +97,30 @@ const FindOrCreateTicketService = async (
       });
     }
   }
-  
-    const whatsapp = await Whatsapp.findOne({
-    where: { id: whatsappId }
-  });
+
+
 
   if (!ticket) {
-    ticket = await Ticket.create({
-      contactId: groupContact ? groupContact.id : contact.id,
-      status: "pending",
-      isGroup: !!groupContact,
-      unreadMessages,
-      whatsappId,
-      whatsapp,
-      companyId
-    });
-    await FindOrCreateATicketTrakingService({
-      ticketId: ticket.id,
-      companyId,
-      whatsappId,
-      userId: ticket.userId
-    });
+    try {
+      ticket = await Ticket.create({
+        contactId: groupContact ? groupContact.id : contact.id,
+        status: "pending",
+        isGroup: !!groupContact,
+        unreadMessages,
+        whatsappId,
+        companyId
+      });
+      await FindOrCreateATicketTrakingService({
+        ticketId: ticket.id,
+        companyId,
+        whatsappId,
+        userId: ticket.userId
+      });
+
+    } catch (error) {
+      console.log("error ao criar ticket >>>", error);
+    }
+
   }
 
   ticket = await ShowTicketService(ticket.id, companyId);

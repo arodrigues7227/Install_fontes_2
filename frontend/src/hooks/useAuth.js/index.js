@@ -73,11 +73,45 @@ const useAuth = () => {
       setLoading(false);
     })();
   }, []);
+  useEffect(() => {
+    try {
+      if (user && localStorage.getItem("token")) {
+        const interval = setInterval(async () => {
+          if (user && localStorage.getItem("token")) {
+            try {
+              const { data } = await api.post("/auth/refresh_token");
+              console.log("Running refresh Token" , new Date())
+              if (data) {
+                localStorage.setItem("token", JSON.stringify(data.token));
+                api.defaults.headers.Authorization = `Bearer ${data.token}`;
+              }
+
+            } catch (error) {
+
+            }
+
+          }				//return api(originalRequest);
+        },
+          1000
+          * 60
+          * 3);
+        return () => {
+          clearInterval(interval)
+
+        };
+
+      }
+    } catch (error) {
+
+    }
+
+
+  }, [user]);
 
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");
     if (companyId) {
-   
+
       const socket = socketManager.getSocket(companyId);
 
       socket.on(`company-${companyId}-user`, (data) => {
@@ -85,12 +119,12 @@ const useAuth = () => {
           setUser(data.user);
         }
       });
-    
-    
-    return () => {
-      socket.disconnect();
-    };
-  }
+
+
+      return () => {
+        socket.disconnect();
+      };
+    }
   }, [socketManager, user]);
 
   const handleLogin = async (userData) => {

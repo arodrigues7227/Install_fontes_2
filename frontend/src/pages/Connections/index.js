@@ -104,6 +104,7 @@ const Connections = () => {
 	const [qrModalOpen, setQrModalOpen] = useState(false);
 	const [selectedWhatsApp, setSelectedWhatsApp] = useState(null);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+	const [keyword, setKeyword] = useState("");
 	const confirmationModalInitialState = {
 		action: "",
 		title: "",
@@ -168,6 +169,7 @@ const Connections = () => {
 
 	const handleOpenConfirmationModal = (action, whatsAppId) => {
 		if (action === "disconnect") {
+			setKeyword("");
 			setConfirmModalInfo({
 				action: action,
 				title: i18n.t("connections.confirmationModal.disconnectTitle"),
@@ -177,10 +179,11 @@ const Connections = () => {
 		}
 
 		if (action === "delete") {
+			setKeyword("Deletar");
 			setConfirmModalInfo({
 				action: action,
 				title: i18n.t("connections.confirmationModal.deleteTitle"),
-				message: i18n.t("connections.confirmationModal.deleteMessage"),
+				message: i18n.t("Você deseja mesmo deletar o WhatsApp?\n Solicite ao adiministrador a palavra chave para"),
 				whatsAppId: whatsAppId,
 			});
 		}
@@ -310,6 +313,7 @@ const Connections = () => {
 				open={confirmModalOpen}
 				onClose={setConfirmModalOpen}
 				onConfirm={handleSubmitConfirmationModal}
+				keyword={keyword}
 			>
 				{confirmModalInfo.message}
 			</ConfirmationModal>

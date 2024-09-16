@@ -257,7 +257,7 @@ const NotificationsPopOver = (volume) => {
 					) : (
 						notifications.map(ticket => (
 							<NotificationTicket key={ticket.id}>
-								<TicketListItem ticket={ticket} />
+								<TicketListItem ticket={ticket} isNotification={true} />
 							</NotificationTicket>
 						))
 					)}

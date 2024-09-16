@@ -8,6 +8,7 @@ import { SerializeUser } from "../../helpers/SerializeUser";
 import Queue from "../../models/Queue";
 import Company from "../../models/Company";
 import Setting from "../../models/Setting";
+import UpdateUserNoQueue from "./UpdateUserNoQueue";
 
 interface SerializedUser {
   id: number;
@@ -45,9 +46,14 @@ const AuthUserService = async ({
   if (!(await user.checkPassword(password))) {
     throw new AppError("ERR_INVALID_CREDENTIALS", 401);
   }
+  const tokenVersion = user.tokenVersion+1
 
-  const token = createAccessToken(user);
-  const refreshToken = createRefreshToken(user);
+  await user.update({tokenVersion})
+
+  await UpdateUserNoQueue({ user, userData: { lastPresence: new Date() } })
+
+  const token = createAccessToken(user, tokenVersion);
+  const refreshToken = createRefreshToken(user, tokenVersion);
 
   const serializedUser = await SerializeUser(user);
 

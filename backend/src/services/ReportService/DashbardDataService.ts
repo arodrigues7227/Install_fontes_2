@@ -27,6 +27,8 @@ export default async function DashboardDataService(
         c.name "companyName",
         u.name "userName",
         u.online "userOnline",
+        u."lastPresence",
+        u."tokenVersion",
         w.name "whatsappName",
         ct.name "contactName",
         ct.number "contactNumber",
@@ -94,6 +96,8 @@ export default async function DashboardDataService(
       select
         u.id,
         u.name,
+        u."lastPresence",
+        u."tokenVersion",
         coalesce(att."avgSupportTime", 0) "avgSupportTime",
         att.tickets,
         att.rating,
