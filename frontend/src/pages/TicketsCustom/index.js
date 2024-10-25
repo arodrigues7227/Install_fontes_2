@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: "column",
 	},
 	welcomeMsg: {
-		backgroundColor: theme.palette.boxticket, //DARK MODE PLW DESIGN//
+		backgroundColor: theme.palette.boxticket, //DARK MODE LEVEL10 TECH//
 		display: "flex",
 		justifyContent: "space-evenly",
 		alignItems: "center",

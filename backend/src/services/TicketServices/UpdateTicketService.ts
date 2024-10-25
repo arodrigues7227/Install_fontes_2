@@ -12,8 +12,8 @@ import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
 import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingService";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import { verifyMessage } from "../WbotServices/wbotMessageListener";
-import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne"; //NOVO PLW DESIGN//
-import ShowUserService from "../UserServices/ShowUserService"; //NOVO PLW DESIGN//
+import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne"; //NOVO LEVEL10 TECH//
+import ShowUserService from "../UserServices/ShowUserService"; //NOVO LEVEL10 TECH//
 import { isNil } from "lodash";
 import Message from "../../models/Message";
 import { map_msg } from "../../utils/global";
