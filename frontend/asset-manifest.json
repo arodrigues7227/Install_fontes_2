@@ -1,0 +1,43 @@
+{
+  "files": {
+    "main.css": "/static/css/main.716ef94e.chunk.css",
+    "main.js": "/static/js/main.d4429528.chunk.js",
+    "runtime-main.js": "/static/js/runtime-main.b825761c.js",
+    "static/css/2.0beaeeb3.chunk.css": "/static/css/2.0beaeeb3.chunk.css",
+    "static/js/2.658a6ca0.chunk.js": "/static/js/2.658a6ca0.chunk.js",
+    "static/js/3.44a75ad4.chunk.js": "/static/js/3.44a75ad4.chunk.js",
+    "index.html": "/index.html",
+    "precache-manifest.708117ff8b533e9e507d88e3131f530d.js": "/precache-manifest.708117ff8b533e9e507d88e3131f530d.js",
+    "service-worker.js": "/service-worker.js",
+    "static/js/2.658a6ca0.chunk.js.LICENSE.txt": "/static/js/2.658a6ca0.chunk.js.LICENSE.txt",
+    "static/js/3.44a75ad4.chunk.js.LICENSE.txt": "/static/js/3.44a75ad4.chunk.js.LICENSE.txt",
+    "static/media/Dashboard1.jpg": "/static/media/Dashboard1.decf0fdf.jpg",
+    "static/media/Dashboard2.jpeg": "/static/media/Dashboard2.15a4c6c9.jpeg",
+    "static/media/Login1.jpeg": "/static/media/Login1.da5f0f49.jpeg",
+    "static/media/Login2.jpeg": "/static/media/Login2.b3f1a51e.jpeg",
+    "static/media/SignUp1.jpeg": "/static/media/SignUp1.27511546.jpeg",
+    "static/media/SignUp2.jpeg": "/static/media/SignUp2.9c8d898e.jpeg",
+    "static/media/TicketsManagerTabs1.jpg": "/static/media/TicketsManagerTabs1.619c3a65.jpg",
+    "static/media/TicketsManagerTabs2.jpg": "/static/media/TicketsManagerTabs2.362fffa6.jpg",
+    "static/media/chat_notify.mp3": "/static/media/chat_notify.2529c259.mp3",
+    "static/media/email.png": "/static/media/email.c75e27c9.png",
+    "static/media/fundo.mp4": "/static/media/fundo.325c3d0c.mp4",
+    "static/media/instagram.png": "/static/media/instagram.0b6b3c8d.png",
+    "static/media/logo.png": "/static/media/logo.b801b20b.png",
+    "static/media/n8n.png": "/static/media/n8n.5c788b8d.png",
+    "static/media/planilha.xlsx": "/static/media/planilha.549edeba.xlsx",
+    "static/media/sound.mp3": "/static/media/sound.9fd5812c.mp3",
+    "static/media/success.gif": "/static/media/success.786a3db7.gif",
+    "static/media/wa-background-dark.png": "/static/media/wa-background-dark.8244f042.png",
+    "static/media/wa-background.png": "/static/media/wa-background.adbccee0.png",
+    "static/media/webhook.png": "/static/media/webhook.e5374d73.png",
+    "static/media/whatsapp.png": "/static/media/whatsapp.ae8a9a2f.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b825761c.js",
+    "static/css/2.0beaeeb3.chunk.css",
+    "static/js/2.658a6ca0.chunk.js",
+    "static/css/main.716ef94e.chunk.css",
+    "static/js/main.d4429528.chunk.js"
+  ]
+}
