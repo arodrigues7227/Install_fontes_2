@@ -49,7 +49,7 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
   try {
 
     const { rows: tickets } = await Ticket.findAndCountAll({
-      where: { status: { [Op.in]: ["open"] }, companyId },
+      where: { status: { [Op.in]: ["open", "npsOpen"] }, companyId },
       order: [["updatedAt", "DESC"]]
     });
 
@@ -59,7 +59,7 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
     tickets.forEach(async ticket => {
       const showTicket = await ShowTicketService(ticket.id, companyId);
       const whatsapp = await Whatsapp.findByPk(showTicket?.whatsappId);
-      console.log('whatsapp', JSON.stringify(whatsapp, null, 2))
+
       const ticketTraking = await TicketTraking.findOne({
         where: {
           ticketId: ticket.id,
@@ -70,7 +70,7 @@ export const ClosedAllOpenTickets = async (companyId: number): Promise<void> => 
       if (!whatsapp) return;
 
       let {
-        expiresInactiveMessage, //mensage de encerramento por inatividade      
+        expiresInactiveMessage, //mensage de encerramento por inatividade
         expiresTicket //tempo em horas para fechar ticket automaticamente
       } = whatsapp
 

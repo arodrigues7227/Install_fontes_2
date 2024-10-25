@@ -20,7 +20,6 @@ import ContactList from "./models/ContactList";
 import ContactListItem from "./models/ContactListItem";
 import Plan from "./models/Plan";
 import Schedule from "./models/Schedule";
-import User from "./models/User";
 import Whatsapp from "./models/Whatsapp";
 import ShowFileService from "./services/FileServices/ShowService";
 import { getMessageOptions } from "./services/WbotServices/SendWhatsAppMedia";
@@ -28,7 +27,6 @@ import { ClosedAllOpenTickets } from "./services/WbotServices/wbotClosedTickets"
 import { logger } from "./utils/logger";
 
 
-const nodemailer = require('nodemailer');
 const CronJob = require('cron').CronJob;
 
 const connection = process.env.REDIS_URI || "";
@@ -55,7 +53,6 @@ interface DispatchCampaignData {
 
 /* export const userMonitor = new BullQueue("UserMonitor", connection); */
 
-export const queueMonitor = new BullQueue("QueueMonitor", connection);
 
 export const messageQueue = new BullQueue("MessageQueue", connection, {
   limiter: {
@@ -306,7 +303,7 @@ async function handleVerifyCampaigns(job) {
 
   if (campaigns.length > 0)
     logger.info(`Campanhas encontradas: ${campaigns.length}`);
-  
+
   for (let campaign of campaigns) {
     try {
       const now = moment();
@@ -834,7 +831,7 @@ async function handleInvoiceCreate() {
                         pass: 'senha'
                       }
                     });
- 
+
                     const mailOptions = {
                       from: 'heenriquega@gmail.com', // sender address
                       to: `${c.email}`, // receiver (use array of string for a list)
@@ -848,7 +845,7 @@ async function handleInvoiceCreate() {
           Qualquer duvida estamos a disposição!
                       `// plain text body
                     };
- 
+
                     transporter.sendMail(mailOptions, (err, info) => {
                       if (err)
                         console.log(err)
@@ -892,7 +889,7 @@ export async function startQueueProcess() {
 
   //userMonitor.process("VerifyLoginStatus", handleLoginStatus);
 
-  //queueMonitor.process("VerifyQueueStatus", handleVerifyQueue);
+
 
 
 
@@ -923,12 +920,4 @@ export async function startQueueProcess() {
     }
   ); */
 
-  queueMonitor.add(
-    "VerifyQueueStatus",
-    {},
-    {
-      repeat: { cron: "*/20 * * * * *" },
-      removeOnComplete: true
-    }
-  );
 }

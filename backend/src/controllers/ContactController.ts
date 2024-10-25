@@ -101,7 +101,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
         companyId
       }
     });
-    
+
     if (existingContact) {
       // Contact already exists, send the existing contact data as the response
       return res.status(200).json({ alreadyExists: true, existingContact });
@@ -143,9 +143,11 @@ export const update = async (
   const contactData: ContactData = req.body;
   const { companyId } = req.user;
 
+  const isGroup = contactData.number?.length > 15;
+
   const schema = Yup.object().shape({
     name: Yup.string(),
-    number: Yup.string().matches(
+    number: isGroup ? Yup.string() : Yup.string().matches(
       /^\d+$/,
       "Invalid number format. Only numbers is allowed."
     )
@@ -156,11 +158,17 @@ export const update = async (
   } catch (err: any) {
     throw new AppError(err.message);
   }
+  if(isGroup){
+    contactData.number
+  }else{
+    await CheckIsValidContact(contactData.number, companyId);
+    const validNumber = await CheckContactNumber(contactData.number, companyId);
+    const number = validNumber.jid.replace(/\D/g, "");
+    contactData.number = number;
 
-  await CheckIsValidContact(contactData.number, companyId);
-  const validNumber = await CheckContactNumber(contactData.number, companyId);
-  const number = validNumber.jid.replace(/\D/g, "");
-  contactData.number = number;
+  }
+
+
 
   const { contactId } = req.params;
 
@@ -238,16 +246,12 @@ export const getContactVcard = async (
   const numberUser = vNumber.toString().substr(-8, 8);
 
   if (numberDDD <= '30' && numberDDI === '55') {
-    console.log("menor 30")
     vNumber = `${numberDDI + numberDDD + 9 + numberUser}@s.whatsapp.net`;
   } else if (numberDDD > '30' && numberDDI === '55') {
-    console.log("maior 30")
     vNumber = `${numberDDI + numberDDD + numberUser}@s.whatsapp.net`;
   } else {
     vNumber = `${number}@s.whatsapp.net`;
   }
-
-  console.log(vNumber);
 
   const contact = await GetContactService({
     name,

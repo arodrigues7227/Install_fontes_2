@@ -56,7 +56,7 @@ const UpdateTicketService = async ({
     let queueOptionId: number | null = ticketData.queueOptionId || null;
 
 
-    
+
 
     const io = getIO();
 
@@ -70,7 +70,13 @@ const UpdateTicketService = async ({
 
 
 
-    const ticket = await ShowTicketService(ticketId, companyId);
+    let ticket = await ShowTicketService(ticketId, companyId);
+
+    if(ticket?.contact?.users?.length > 0){
+      ticketData.userId = null
+    }
+
+
     map_msg.delete(ticket.contact.number);
     const ticketTraking = await FindOrCreateATicketTrakingService({
       ticketId,
@@ -82,7 +88,9 @@ const UpdateTicketService = async ({
       whatsappId = ticket.whatsappId.toString();
     }
 
-    await SetTicketMessagesAsRead(ticket);
+    if(!ticket.isGroup){
+      await SetTicketMessagesAsRead(ticket);
+    }
 
     const oldStatus = ticket.status;
     const oldUserId = ticket.user?.id;
@@ -95,15 +103,16 @@ const UpdateTicketService = async ({
       queueOptionId = null;
     }
 
-    if (status !== undefined && ["closed"].indexOf(status) > -1) {
+    if (status !== undefined && ["closed"].indexOf(status) > -1 && !ticket.isGroup) {
       const { complationMessage, ratingMessage } = await ShowWhatsAppService(
         ticket.whatsappId,
         companyId
       );
-
-      console.log("oldStatus >>>", oldStatus);
       if (setting?.value === "enabled" && oldStatus === "open") {
         if (ticketTraking.ratingAt == null) {
+          ticket.update({
+            status: "npsOpen"
+          })
           const ratingTxt = ratingMessage || "";
           let bodyRatingMessage = `\u200e${ratingTxt}\n\n`;
           bodyRatingMessage +=
@@ -128,7 +137,7 @@ const UpdateTicketService = async ({
         ticketTraking.rated = false;
       }
 
-      if (!isNil(complationMessage) && complationMessage !== "") {
+      if (!isNil(complationMessage) && complationMessage !== "" && !ticket.isGroup) {
         const body = `\u200e${complationMessage}`;
         await SendWhatsAppMessage({ body, ticket });
       }
@@ -156,7 +165,7 @@ const UpdateTicketService = async ({
 
     if (settingsTransfTicket?.value === "enabled") {
       // Mensagem de transferencia da FILA
-      if (oldQueueId !== queueId && oldUserId === userId && !isNil(oldQueueId) && !isNil(queueId)) {
+      if (oldQueueId !== queueId && oldUserId === userId && !isNil(oldQueueId) && !isNil(queueId) && !ticket.isGroup) {
 
         const queue = await Queue.findByPk(queueId);
         const wbot = await GetTicketWbot(ticket);
@@ -172,7 +181,7 @@ const UpdateTicketService = async ({
       }
       else
         // Mensagem de transferencia do ATENDENTE
-        if (oldUserId !== userId && oldQueueId === queueId && !isNil(oldUserId) && !isNil(userId)) {
+        if (oldUserId !== userId && oldQueueId === queueId && !isNil(oldUserId) && !isNil(userId) && !ticket.isGroup) {
           const wbot = await GetTicketWbot(ticket);
           const nome = await ShowUserService(ticketData.userId);
           const msgtxt = "*Mensagem automática*:\nFoi transferido para o atendente *" + nome.name + "*\naguarde, já vamos te atender!";
@@ -187,7 +196,7 @@ const UpdateTicketService = async ({
         }
         else
           // Mensagem de transferencia do ATENDENTE e da FILA
-          if (oldUserId !== userId && !isNil(oldUserId) && !isNil(userId) && oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId)) {
+          if (oldUserId !== userId && !isNil(oldUserId) && !isNil(userId) && oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId) && !ticket.isGroup) {
             const wbot = await GetTicketWbot(ticket);
             const queue = await Queue.findByPk(queueId);
             const nome = await ShowUserService(ticketData.userId);
@@ -201,7 +210,7 @@ const UpdateTicketService = async ({
             );
             await verifyMessage(queueChangedMessage, ticket, ticket.contact);
           } else
-            if (oldUserId !== undefined && isNil(userId) && oldQueueId !== queueId && !isNil(queueId)) {
+            if (oldUserId !== undefined && isNil(userId) && oldQueueId !== queueId && !isNil(queueId) && !ticket.isGroup) {
 
               const queue = await Queue.findByPk(queueId);
               const wbot = await GetTicketWbot(ticket);
@@ -214,7 +223,7 @@ const UpdateTicketService = async ({
                 }
               );
               await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-            }      
+            }
     }
 
     if(oldQueueId !== queueId){
@@ -262,6 +271,8 @@ const UpdateTicketService = async ({
     }
 
     await ticketTraking.save();
+
+    ticket = await ShowTicketService(ticketId, companyId);
 
     if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
 

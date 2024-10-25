@@ -15,8 +15,8 @@ const ShowTicketUUIDService = async (uuid: string): Promise<Ticket> => {
       {
         model: Contact,
         as: "contact",
-        attributes: ["id", "name", "number", "email", "profilePicUrl"],
-        include: ["extraInfo"]
+        attributes: ["id", "name", "number", "email", "profilePicUrl", "isGroup"],
+        include: ["extraInfo", "users"]
       },
       {
         model: User,
@@ -39,7 +39,7 @@ const ShowTicketUUIDService = async (uuid: string): Promise<Ticket> => {
         attributes: ["id", "name", "color"]
       }
     ]
-  }); 
+  });
 
   if (!ticket) {
     throw new AppError("ERR_NO_TICKET_FOUND", 404);

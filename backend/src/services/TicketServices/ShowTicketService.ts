@@ -5,7 +5,6 @@ import User from "../../models/User";
 import Queue from "../../models/Queue";
 import Tag from "../../models/Tag";
 import Whatsapp from "../../models/Whatsapp";
-import Prompt from "../../models/Prompt";
 import Company from "../../models/Company";
 
 const ShowTicketService = async (
@@ -17,8 +16,8 @@ const ShowTicketService = async (
       {
         model: Contact,
         as: "contact",
-        attributes: ["id", "name", "number", "email", "profilePicUrl"],
-        include: ["extraInfo"]
+        attributes: ["id", "name", "number", "email", "profilePicUrl", "isGroup"],
+        include: ["extraInfo", "users"]
       },
       {
         model: User,

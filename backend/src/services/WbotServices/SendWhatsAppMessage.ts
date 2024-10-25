@@ -4,15 +4,15 @@ import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
-
 import formatBody from "../../helpers/Mustache";
-import { map_msg } from "../../utils/global";
+import { logger } from "../../utils/logger";
+
 
 interface Request {
   body: string;
   ticket: Ticket;
   quotedMsg?: Message;
-  isForwarded?: boolean;  
+  isForwarded?: boolean;
 }
 
 const SendWhatsAppMessage = async ({
@@ -52,6 +52,8 @@ const SendWhatsAppMessage = async ({
   }
 
   try {
+
+
     const sentMessage = await wbot.sendMessage(number, {
       text: formatBody(body, ticket.contact),
       // text: body, //formatBody(body, ticket.contact),
@@ -66,7 +68,7 @@ const SendWhatsAppMessage = async ({
     return sentMessage;
   } catch (err) {
     Sentry.captureException(err);
-    console.log(err);
+    logger.error(err);
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };

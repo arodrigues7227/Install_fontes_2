@@ -412,7 +412,8 @@ ${JSON.stringify(msg)}`);
   } catch (error) {
     Sentry.setExtra("Error getTypeMessage", { msg, BodyMsg: msg.message });
     Sentry.captureException(error);
-    console.log(error);
+    logger.error(error);
+  //console.log(error);
   }
 };
 
@@ -511,7 +512,7 @@ const downloadMedia = async (msg: proto.IWebMessageInfo) => {
     msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage;
 
   if (!mineType)
-    console.log(msg)
+  //console.log(msg)
 
   if (!filename) {
     const ext = mineType.mimetype.split("/")[1].split(";")[0];
@@ -543,14 +544,20 @@ const verifyContact = async (
     profilePicUrl = `${process.env.FRONTEND_URL}/nopicture.png`;
   }
 
+
+  const isGroup = msgContact.id.includes("g.us");
+
+  const number = msgContact.id.split("@")[0]
   const contactData = {
     name: msgContact?.name || msgContact.id.replace(/\D/g, ""),
-    number: msgContact.id.replace(/\D/g, ""),
+    number: number,
     profilePicUrl,
-    isGroup: msgContact.id.includes("g.us"),
+    isGroup,
     companyId,
     whatsappId: wbot.id
   };
+
+//console.log('contactData:', contactData)
 
 
 
@@ -748,7 +755,7 @@ const handleOpenAi = async (
     }
 
     if (prompt.voice === "texto") {
-      console.log('responseVoice', response)
+    //console.log('responseVoice', response)
       const sentMessage = await wbot.sendMessage(msg.key.remoteJid!, {
         text: response!
       });
@@ -773,7 +780,7 @@ const handleOpenAi = async (
           deleteFileSync(`${publicFolder}/${fileNameWithOutExtension}.mp3`);
           deleteFileSync(`${publicFolder}/${fileNameWithOutExtension}.wav`);
         } catch (error) {
-          console.log(`Erro para responder com audio: ${error}`);
+        //console.log(`Erro para responder com audio: ${error}`);
         }
       });
     }
@@ -818,7 +825,7 @@ const handleOpenAi = async (
         .trim();
     }
     if (prompt.voice === "texto") {
-      console.log('responseVoice2', response)
+    //console.log('responseVoice2', response)
       const sentMessage = await wbot.sendMessage(msg.key.remoteJid!, {
         text: `\u200e ${response!}`
       });
@@ -843,7 +850,7 @@ const handleOpenAi = async (
           deleteFileSync(`${publicFolder}/${fileNameWithOutExtension}.mp3`);
           deleteFileSync(`${publicFolder}/${fileNameWithOutExtension}.wav`);
         } catch (error) {
-          console.log(`Erro para responder com audio: ${error}`);
+        //console.log(`Erro para responder com audio: ${error}`);
         }
       });
     }
@@ -1109,7 +1116,7 @@ const verifyQueue = async (
     if (greetingMessage.length > 1 && sendGreetingMessageOneQueues?.value === "enabled") {
       const body = formatBody(`${greetingMessage}`, contact);
 
-      console.log('body2', body)
+    //console.log('body2', body)
       await wbot.sendMessage(
         `${contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
         {
@@ -1183,7 +1190,7 @@ const verifyQueue = async (
 
   /**
    * recebe as mensagens dos usuários e envia as opções de fila
-   * tratamento de mensagens para resposta aos usuarios apartir do chatbot/fila.         
+   * tratamento de mensagens para resposta aos usuarios apartir do chatbot/fila.
    */
   const botText = async () => {
     let options = "";
@@ -1253,7 +1260,7 @@ const verifyQueue = async (
         schedule = schedules.find((s) => s.weekdayEn === weekday && s.startTime !== "" && s.startTime !== null && s.endTime !== "" && s.endTime !== null && s.startTime <= hour && s.endTime >= hour);
       }
 
-      if (isNil(schedule)) {
+      if (isNil(schedule) && !ticket.isGroup) {
         const body = formatBody(`\u200e ${queue.outOfHoursMessage || "Estamos fora do horário de expediente, assim que possível retornaremos o contato."}\n\n*[ # ]* - Voltar ao Menu Principal`, ticket.contact);
         const sentMessage = await wbot.sendMessage(
           `${contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, {
@@ -1306,7 +1313,7 @@ const verifyQueue = async (
       const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket.contact
       );
       if (choosenQueue.greetingMessage) {
-        console.log('body33333333', body)
+      //console.log('body33333333', body)
         const sentMessage = await wbot.sendMessage(
           `${contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, {
           text: body,
@@ -1404,7 +1411,7 @@ export const handleRating = async (
       }
 
     } catch (error) {
-      console.log('error Rating', error)
+    //console.log('error Rating', error)
     }
 
   }
@@ -1619,7 +1626,7 @@ const handleChartbot = async (ticket: Ticket, msg: WAMessage, wbot: Session, don
         text: formatBody(`\u200e${queue.greetingMessage}\n\n${options}`, ticket.contact),
       };
 
-      console.log('textMessage5555555555555', textMessage)
+    //console.log('textMessage5555555555555', textMessage)
       const sendMsg = await wbot.sendMessage(
         `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
         textMessage
@@ -1771,7 +1778,7 @@ const handleChartbot = async (ticket: Ticket, msg: WAMessage, wbot: Session, don
           text: formatBody(`\u200e${currentOption.message}\n\n${options}`, ticket.contact),
         };
 
-        console.log('textMessage6666666666', textMessage)
+      //console.log('textMessage6666666666', textMessage)
         const sendMsg = await wbot.sendMessage(
           `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
           textMessage
@@ -1834,7 +1841,7 @@ export const handleMessageIntegration = async (
             throw new Error(error);
           }
           else {
-            console.log(response.body);
+          //console.log(response.body);
           }
         });
       } catch (error) {
@@ -1843,7 +1850,7 @@ export const handleMessageIntegration = async (
     }
 
   } else if (queueIntegration.type === "typebot") {
-    console.log("entrou no typebot")
+  //console.log("entrou no typebot")
     // await typebots(ticket, msg, wbot, queueIntegration);
     await typebotListener({ ticket, msg, wbot, typebot: queueIntegration });
 
@@ -2000,17 +2007,17 @@ const handleMessage = async (
       }
     } catch (e) {
       Sentry.captureException(e);
-      console.log(e);
+    //console.log(e);
     }
 
-    // Atualiza o ticket se a ultima mensagem foi enviada por mim, para que possa ser finalizado. 
+    // Atualiza o ticket se a ultima mensagem foi enviada por mim, para que possa ser finalizado.
     try {
       await ticket.update({
         fromMe: msg.key.fromMe,
       });
     } catch (e) {
       Sentry.captureException(e);
-      console.log(e);
+    //console.log(e);
     }
 
     if (hasMedia) {
@@ -2059,7 +2066,7 @@ const handleMessage = async (
             );
           }
 
-          if (isNil(schedule)) {
+          if (isNil(schedule) && !ticket.isGroup) {
             const body = `\u200e ${whatsapp.outOfHoursMessage || "Estamos fora do horário de expediente, assim que possível retornaremos o contato."}`;
             const debouncedSentMessage = debounce(
               async () => {
@@ -2103,7 +2110,7 @@ const handleMessage = async (
             );
           }
 
-          if (scheduleType.value === "queue" && isNil(schedule)) {
+          if (scheduleType.value === "queue" && isNil(schedule) && !ticket.isGroup) {
             const body = `${queue.outOfHoursMessage || "Estamos fora do horário de expediente, assim que possível retornaremos o contato."}`;
             const debouncedSentMessage = debounce(
               async () => {
@@ -2127,7 +2134,7 @@ const handleMessage = async (
       }
     } catch (e) {
       Sentry.captureException(e);
-      console.log(e);
+    //console.log(e);
     }
 
     try {
@@ -2139,7 +2146,7 @@ const handleMessage = async (
       }
     } catch (e) {
       Sentry.captureException(e);
-      console.log(e);
+    //console.log(e);
     }
 
     //openai na conexao
@@ -2193,7 +2200,7 @@ const handleMessage = async (
       ticket.queue
     ) {
 
-      console.log("entrou no type 1974")
+    //console.log("entrou no type 1974")
       const integrations = await ShowQueueIntegrationService(ticket.integrationId, companyId);
 
       await handleMessageIntegration(msg, wbot, integrations, ticket)
@@ -2244,7 +2251,7 @@ const handleMessage = async (
         }
 
         if (
-          scheduleType.value === "queue" && isNil(schedule)
+          scheduleType.value === "queue" && isNil(schedule) && !ticket.isGroup
         ) {
           const body = queue.outOfHoursMessage || "Estamos fora do horário de expediente, assim que possível retornaremos o contato.";
           const debouncedSentMessage = debounce(
@@ -2267,7 +2274,7 @@ const handleMessage = async (
 
     } catch (e) {
       Sentry.captureException(e);
-      console.log(e);
+    //console.log(e);
     }
 
 
@@ -2288,7 +2295,7 @@ const handleMessage = async (
 
       if (whatsapp.greetingMessage) {
 
-        console.log('whatsapp.greetingMessage', whatsapp.greetingMessage)
+      //console.log('whatsapp.greetingMessage', whatsapp.greetingMessage)
         const debouncedSentMessage = debounce(
           async () => {
             await wbot.sendMessage(
@@ -2321,7 +2328,7 @@ const handleMessage = async (
     }
 
   } catch (err) {
-    console.log(err)
+  //console.log(err)
     Sentry.captureException(err);
     logger.error(`Error handling whatsapp message: Err: ${err}`);
   }
@@ -2455,6 +2462,7 @@ const wbotMessageListener = async (wbot: Session, companyId: number): Promise<vo
       if (!messages) return;
 
       messages.forEach(async (message: proto.IWebMessageInfo) => {
+      //console.log('message:', JSON.stringify(message, null, 2))
 
         const messageExists = await Message.count({
           where: { id: message.key.id!, companyId }

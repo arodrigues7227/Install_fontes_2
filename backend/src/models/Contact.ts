@@ -11,13 +11,16 @@ import {
   Default,
   HasMany,
   ForeignKey,
-  BelongsTo
+  BelongsTo,
+  BelongsToMany
 } from "sequelize-typescript";
 import ContactCustomField from "./ContactCustomField";
 import Ticket from "./Ticket";
 import Company from "./Company";
 import Schedule from "./Schedule";
 import Whatsapp from "./Whatsapp";
+import UsersContacts from "./UsersContacts";
+import User from "./User";
 
 @Table
 class Contact extends Model<Contact> {
@@ -83,6 +86,9 @@ class Contact extends Model<Contact> {
 
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
+
+  @BelongsToMany(() => User, () => UsersContacts)
+  users: User[];
 }
 
 export default Contact;

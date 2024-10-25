@@ -6,6 +6,7 @@ import ShowTicketService from "./ShowTicketService";
 import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingService";
 import Setting from "../../models/Setting";
 import Whatsapp from "../../models/Whatsapp";
+import { logger } from "../../utils/logger";
 
 interface TicketData {
   status?: string;
@@ -20,10 +21,20 @@ const FindOrCreateTicketService = async (
   companyId: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
+
+
+
+  let initialStatus = "pending";
+
+  if (groupContact && groupContact?.users?.length > 0) {
+    initialStatus = "open";
+  }
+
+
   let ticket = await Ticket.findOne({
     where: {
       status: {
-        [Op.or]: ["open", "pending", "closed"]
+        [Op.or]: ["open", "pending", "closed", "npsOpen"]
       },
       contactId: groupContact ? groupContact.id : contact.id,
       companyId,
@@ -33,7 +44,12 @@ const FindOrCreateTicketService = async (
   });
 
   if (ticket) {
-    await ticket.update({ unreadMessages, whatsappId });
+    if (groupContact && groupContact?.users?.length > 0) {
+      initialStatus = "open";
+      await ticket.update({ status: initialStatus, unreadMessages, whatsappId, queueId: null, userId: null });
+    } else {
+      await ticket.update({ unreadMessages, whatsappId });
+    }
   }
 
   if (ticket?.status === "closed") {
@@ -49,8 +65,13 @@ const FindOrCreateTicketService = async (
     });
 
     if (ticket) {
+
+
+
+
+
       await ticket.update({
-        status: "pending",
+        status: initialStatus,
         userId: null,
         unreadMessages,
         queueId: null,
@@ -83,7 +104,7 @@ const FindOrCreateTicketService = async (
 
     if (ticket) {
       await ticket.update({
-        status: "pending",
+        status: initialStatus,
         userId: null,
         unreadMessages,
         queueId: null,
@@ -104,7 +125,7 @@ const FindOrCreateTicketService = async (
     try {
       ticket = await Ticket.create({
         contactId: groupContact ? groupContact.id : contact.id,
-        status: "pending",
+        status: initialStatus,
         isGroup: !!groupContact,
         unreadMessages,
         whatsappId,
@@ -118,12 +139,14 @@ const FindOrCreateTicketService = async (
       });
 
     } catch (error) {
-      console.log("error ao criar ticket >>>", error);
+      logger.error("error ao criar ticket >>>", error);
     }
 
   }
 
   ticket = await ShowTicketService(ticket.id, companyId);
+
+
 
   return ticket;
 };

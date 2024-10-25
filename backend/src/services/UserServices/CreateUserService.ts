@@ -1,7 +1,5 @@
 import * as Yup from "yup";
-
 import AppError from "../../errors/AppError";
-import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 import Plan from "../../models/Plan";
 import Company from "../../models/Company";

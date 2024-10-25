@@ -48,7 +48,7 @@ const ListTicketsService = async ({
   companyId
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
-    [Op.or]: [{ userId }, { status: "pending" }],
+    [Op.or]: [{ userId }, { status: "pending" }, { isGroup: true }],
     queueId: { [Op.or]: [queueIds, null] }
   };
   let includeCondition: Includeable[];
@@ -57,7 +57,8 @@ const ListTicketsService = async ({
     {
       model: Contact,
       as: "contact",
-      attributes: ["id", "name", "number", "email", "profilePicUrl"]
+      attributes: ["id", "name", "number", "email", "profilePicUrl", "isGroup"],
+      include: ["users"]
     },
     {
       model: Queue,
@@ -214,6 +215,8 @@ const ListTicketsService = async ({
     ...whereCondition,
     companyId
   };
+
+
 
   const { count, rows: tickets } = await Ticket.findAndCountAll({
     where: whereCondition,

@@ -1,4 +1,5 @@
 import { getIO } from "../../libs/socket";
+import Contact from "../../models/Contact";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import Whatsapp from "../../models/Whatsapp";
@@ -14,7 +15,7 @@ interface MessageData {
   mediaUrl?: string;
   ack?: number;
   queueId?: number;
-  isForwarded?: boolean;  
+  isForwarded?: boolean;
 }
 interface Request {
   messageData: MessageData;
@@ -34,7 +35,7 @@ const CreateMessageService = async ({
         model: Ticket,
         as: "ticket",
         include: [
-          "contact",
+          {model: Contact, as: "contact", include: ["extraInfo", "users"]},
           "queue",
           {
             model: Whatsapp,

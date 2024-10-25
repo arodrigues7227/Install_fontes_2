@@ -2,6 +2,7 @@ import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
 import ContactCustomField from "../../models/ContactCustomField";
 import { isNil } from "lodash";
+import User from "../../models/User";
 interface ExtraInfo extends ContactCustomField {
   name: string;
   value: string;
@@ -37,12 +38,16 @@ const CreateOrUpdateContactService = async ({
     where: {
       number,
       companyId
-    }
+    },
+    include: [{
+      model: User,
+      as: "users",
+      attributes: ["id", "name"]
+    }]
   });
 
   if (contact) {
     contact.update({ profilePicUrl });
-    console.log(contact.whatsappId)
     if (isNil(contact.whatsappId === null)) {
       contact.update({
         whatsappId

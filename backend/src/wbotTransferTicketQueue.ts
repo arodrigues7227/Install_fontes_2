@@ -1,82 +1,111 @@
 import { Op } from "sequelize";
 import TicketTraking from "./models/TicketTraking";
-import { format } from "date-fns";
 import moment from "moment";
 import Ticket from "./models/Ticket";
 import Whatsapp from "./models/Whatsapp";
 import { getIO } from "./libs/socket";
-import { logger } from "./utils/logger";
 import ShowTicketService from "./services/TicketServices/ShowTicketService";
+import { logger } from "./utils/logger";
 
+
+
+
+
+async function transferirTicket(ticket, wpp) {
+  const io = getIO();
+  await ticket.update({
+    queueId: wpp.transferQueueId,
+  });
+
+  const ticketTraking = await TicketTraking.findOne({
+    where: {
+      ticketId: ticket.id
+    },
+    order: [["createdAt", "DESC"]]
+  });
+
+  await ticketTraking.update({
+    queuedAt: moment().toDate(),
+    queueId: wpp.transferQueueId,
+  });
+
+  const currentTicket = await ShowTicketService(ticket.id, ticket.companyId);
+
+  const companyId = ticket.companyId;
+
+  io.to(`company-${companyId}-pending`)
+    .to(`queue-${ticket.queueId}-pending`)
+    .to(`user-${ticket.userId}`)
+    .emit(`company-${companyId}-ticket`, {
+      action: "delete",
+      ticketId: ticket.id
+    });
+
+
+  io.to(`company-${companyId}-${ticket.status}`)
+    .to(`company-${companyId}-notification`)
+    .to(`queue-${ticket.queueId}-${ticket.status}`)
+    .to(`queue-${ticket.queueId}-notification`)
+    .to(ticket.id.toString())
+    .to(`user-${ticket?.userId}`)
+    .emit(`company-${companyId}-ticket`, {
+      action: "update",
+      ticket: currentTicket
+    });
+
+
+  logger.info(`Ticket ${ticket.id} transferido as ${moment().format("DD/MM/YYYY HH:mm:ss")}`);
+}
 
 export const TransferTicketQueue = async (): Promise<void> => {
 
-  const io = getIO();
 
-  //buscar os tickets que em pendentes e sem fila
-  const tickets = await Ticket.findAll({
+
+  const whatsapps = await Whatsapp.findAll({
     where: {
-      status: "pending",
-      queueId: {
-        [Op.is]: null
+      timeToTransfer: {
+        [Op.gt]: 0
       },
+      transferQueueId: {
+        [Op.not]: null
+      }
     },
-
+    include: [{ model: Ticket, as: "tickets", where: { status: "pending", queueId: null } }]
   });
 
-  // varrer os tickets e verificar se algum deles está com o tempo estourado
-  tickets.forEach(async ticket => {
+  if (whatsapps.length == 0) return;
 
+  for (const wpp of whatsapps) {
+    const tickets = wpp.tickets;
+    for (const ticket of tickets) {
+      const tempoLimiteMs = wpp.timeToTransfer * 60 * 1000;
+      const tempoDecorrido = Date.now() - ticket.updatedAt.getTime();
+      const tempoRestante = tempoLimiteMs - tempoDecorrido;
+      if (tempoRestante <= 0) {
+        await transferirTicket(ticket, wpp);
+      } else if (tempoRestante < 60000) {
+        logger.info(`Agendando transferência do ticket ${ticket.id} em ${tempoRestante}ms`); // Menos de 1 minuto
+        setTimeout(async () => {
+          const ticketAlvo = await Ticket.findOne({
+            where: {
+              status: "pending",
+              queueId: null
+            }
+          });
+          if (ticketAlvo) {
 
-
-    const wpp = await Whatsapp.findOne({
-      where: {
-        id: ticket.whatsappId
+            await transferirTicket(ticket, wpp);
+          }
+        }, tempoRestante);
       }
-    });
-
-    if (!wpp || !wpp.timeToTransfer || !wpp.transferQueueId || wpp.timeToTransfer == 0) return;
-
-    let dataLimite = new Date(ticket.updatedAt);
-    dataLimite.setMinutes(dataLimite.getMinutes() + wpp.timeToTransfer);
-
-    if (new Date() > dataLimite) {
-
-      await ticket.update({
-
-        queueId: wpp.transferQueueId,
-
-      });
-
-      const ticketTraking = await TicketTraking.findOne({
-        where: {
-          ticketId: ticket.id
-        },
-        order: [["createdAt", "DESC"]]
-      });
-
-      await ticketTraking.update({
-        queuedAt: moment().toDate(),
-        queueId: wpp.transferQueueId,
-      });
-
-      const currentTicket = await ShowTicketService(ticket.id, ticket.companyId);
-
-      io.to(ticket.status)
-        .to("notification")
-        .to(ticket.id.toString())
-        .emit(`company-${ticket.companyId}-ticket`, {
-          action: "update",
-          ticket: currentTicket,
-          traking: "created ticket 33"
-        });
-
-      logger.info(`Transferencia de ticket automatica ticket id ${ticket.id} para a fila ${wpp.transferQueueId}`);
-
     }
 
+  }
 
-  });
+
 
 
 }
+
+// Função auxiliar para transferir o ticket
+
