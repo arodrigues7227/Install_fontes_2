@@ -14,7 +14,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import { blue, green, grey } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core/styles";
-import FaceIcon from "@material-ui/icons/Face";
+import GroupIcon from '@material-ui/icons/Group';
 import { i18n } from "../../translate/i18n";
 
 import { Chip, Tooltip } from "@material-ui/core";
@@ -456,9 +456,17 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
           [classes.pendingTicket]: ticket.status === "pending",
         })}
       >
-        <Tooltip arrow placement="right" title={ticket.queue?.name?.toUpperCase() || "SEM FILA"} >
-          <span style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }} className={classes.ticketQueueColor}></span>
-        </Tooltip>
+
+        {ticket.contact?.isGroup && ticket?.contact?.users?.length > 0 ? <>
+        </> : <>
+
+          <Tooltip arrow placement="right" title={ticket.queue?.name?.toUpperCase() || "SEM FILA"} >
+            <span style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }} className={classes.ticketQueueColor}></span>
+          </Tooltip>
+
+
+        </>}
+
         <ListItemAvatar>
           {ticket.status !== "pending" ?
             <Avatar
@@ -546,19 +554,23 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   </>
                 )}
 
-                <span style={{ marginTop: 4, }} className={classes.secondaryContentSecond} >
-                  {ticket?.whatsapp?.name ? <Badge className={classes.connectionTag}>{ticket?.whatsapp?.name?.toUpperCase()}</Badge> : <br></br>}
-                  {ticketUser ? <Badge style={{ backgroundColor: "#000000" }} className={classes.connectionTag}>{ticketUser}</Badge> : <br></br>}
-                  <Badge style={{ backgroundColor: ticket.queue?.color || "#7c7c7c" }} className={classes.connectionTag}>{ticket.queue?.name?.toUpperCase() || "SEM FILA"}</Badge>
-                </span>
+                {(ticket?.contact?.isGroup && ticket?.contact?.users?.length > 0) ? <>
+                  <span style={{ marginTop: 4, }} className={classes.secondaryContentSecond} >
+                    <Tooltip title="Grupo Interno">
+                      <Badge style={{ backgroundColor: "blue" }} className={classes.connectionTag}><span style={{ fontSize: 11 }}><GroupIcon style={{ verticalAlign: "middle", fontSize: 16 }} /></span> </Badge>
 
-                {/* <span style={{ marginTop: 2, fontSize: 5 }} className={classes.secondaryContentSecond} >
-                  {ticket?.whatsapp?.name ? <Badge className={classes.connectionTag}>{ticket?.whatsapp?.name?.toUpperCase()}</Badge> : <br></br>}
-                </span> */}
+                    </Tooltip>
+                    {ticket?.whatsapp?.name ? <Badge className={classes.connectionTag}>{ticket?.whatsapp?.name?.toUpperCase()}</Badge> : <br></br>}
+                  </span>
+                </> : <>
+                  <span style={{ marginTop: 4, }} className={classes.secondaryContentSecond} >
 
-                {/*<span style={{ marginTop: 4, fontSize: 5 }} className={classes.secondaryContentSecond} >
-                  {ticketUser ? <Chip size="small" icon={<FaceIcon />} label={ticketUser} variant="outlined" /> : <br></br>}
-                </span>*/}
+                    {ticket?.whatsapp?.name ? <Badge className={classes.connectionTag}>{ticket?.whatsapp?.name?.toUpperCase()}</Badge> : <br></br>}
+                    {ticketUser ? <Badge style={{ backgroundColor: "#000000" }} className={classes.connectionTag}>{ticketUser}</Badge> : <br></br>}
+                    <Badge style={{ backgroundColor: ticket.queue?.color || "#7c7c7c" }} className={classes.connectionTag}>{ticket.queue?.name?.toUpperCase() || "SEM FILA"}</Badge>
+                  </span>
+
+                </>}
 
                 <span style={{ paddingTop: "2px" }} className={classes.secondaryContentSecond} >
                   {tag?.map((tag) => {
@@ -692,43 +704,52 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 
           {ticket.status !== "closed" && ticket.status !== "pending" && ticket.status !== "attending" && (
             <>
-              <ButtonWithSpinner
-                style={{
-                  backgroundColor: 'blue',
-                  color: 'white',
-                  padding: '0px',
-                  bottom: '17px',
-                  borderRadius: '0px',
-                  left: '8px',
-                  fontSize: '0.6rem'
-                }}
-                variant="contained"
-                className={classes.acceptButton}
-                size="small"
-                loading={loading}
-                onClick={e => handleOpenTransferModal()}
-              >
-                {i18n.t("ticketsList.buttons.transfer")}
-              </ButtonWithSpinner>
 
-              <ButtonWithSpinner
-                style={{
-                  backgroundColor: 'red',
-                  color: 'white',
-                  padding: '0px',
-                  bottom: '0px',
-                  borderRadius: '0px',
-                  left: '8px',
-                  fontSize: '0.6rem'
-                }}
-                variant="contained"
-                className={classes.acceptButton}
-                size="small"
-                loading={loading}
-                onClick={e => handleCloseTicket(ticket.id)}
-              >
-                {i18n.t("ticketsList.buttons.closed")}
-              </ButtonWithSpinner>
+              {(ticket?.contact?.isGroup && ticket?.contact?.users?.length > 0) ?
+                <>
+                </>
+                : <>
+
+                  <ButtonWithSpinner
+                    style={{
+                      backgroundColor: 'blue',
+                      color: 'white',
+                      padding: '0px',
+                      bottom: '17px',
+                      borderRadius: '0px',
+                      left: '8px',
+                      fontSize: '0.6rem'
+                    }}
+                    variant="contained"
+                    className={classes.acceptButton}
+                    size="small"
+                    loading={loading}
+                    onClick={e => handleOpenTransferModal()}
+                  >
+                    {i18n.t("ticketsList.buttons.transfer")}
+                  </ButtonWithSpinner>
+                  <ButtonWithSpinner
+                    style={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      padding: '0px',
+                      bottom: '0px',
+                      borderRadius: '0px',
+                      left: '8px',
+                      fontSize: '0.6rem'
+                    }}
+                    variant="contained"
+                    className={classes.acceptButton}
+                    size="small"
+                    loading={loading}
+                    onClick={e => handleCloseTicket(ticket.id)}
+                  >
+                    {i18n.t("ticketsList.buttons.closed")}
+                  </ButtonWithSpinner>
+                </>}
+
+
+
             </>
           )}
 

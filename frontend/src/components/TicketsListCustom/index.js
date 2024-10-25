@@ -162,6 +162,7 @@ const reducer = (state, action) => {
   }
 };
 
+
 const TicketsListCustom = (props) => {
   const {
     status,
@@ -199,7 +200,7 @@ const TicketsListCustom = (props) => {
   useEffect(() => {
     const queueIds = queues.map((q) => q.id);
     const filteredTickets = tickets.filter(
-      (t) => queueIds.indexOf(t.queueId) > -1
+      (t) => (t.contact?.users?.map((u) => u.id).indexOf(user.id) > -1 || queueIds.indexOf(t.queueId) > -1)
     );
 
     if (profile === "user") {
@@ -213,13 +214,39 @@ const TicketsListCustom = (props) => {
     const companyId = localStorage.getItem("companyId");
     const socket = socketManager.getSocket(companyId);
 
-    const shouldUpdateTicket = (ticket) =>
-      (!ticket.userId || ticket.userId === user?.id || showAll) &&
-      (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1);
+    const shouldUpdateTicket = (ticket) => {
+      const queueIds = queues.map((q) => q.id);
 
-    const notBelongsToUserQueues = (ticket) =>
-      ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1;
+      if (profile === "user") {
+        console.log("Users Contact Ticket >>>",ticket.contact?.users?.map((u) => u.id).indexOf(user.id));
 
+        if (ticket.contact?.users?.map((u) => u.id).indexOf(user.id) !== -1) {
+          return true;
+        }
+
+        if (queueIds.indexOf(ticket?.queue?.id) === -1 || ticket.queue === null) {
+          return false;
+        }
+      }
+
+      return (
+        (!ticket.userId || ticket.userId === user?.id || showAll) &&
+        (!ticket.queueId || selectedQueueIds.indexOf(ticket.queueId) > -1)
+      );
+    }
+
+    const notBelongsToUserQueues = (ticket) => {
+      if (ticket.queueId && selectedQueueIds.indexOf(ticket.queueId) === -1) {
+        return true;
+      }
+      if (ticket.contact?.users?.map((u) => u.id).indexOf(user.id) !== -1) {
+        return true;
+      }
+      else {
+        return false;
+      }
+
+    }
     socket.on("ready", () => {
       if (status) {
         socket.emit("joinTickets", status);
@@ -229,7 +256,8 @@ const TicketsListCustom = (props) => {
     });
 
     socket.on(`company-${companyId}-ticket`, (data) => {
-      
+
+      console.log("Data >>>",data);
       if (data.action === "updateUnread") {
         dispatch({
           type: "RESET_UNREAD",
@@ -237,16 +265,21 @@ const TicketsListCustom = (props) => {
         });
       }
 
-      if (data.action === "update" && shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
-        dispatch({
-          type: "UPDATE_TICKET",
-          payload: data.ticket,
-        });
-      }
 
       if (data.action === "update" && notBelongsToUserQueues(data.ticket)) {
         dispatch({ type: "DELETE_TICKET", payload: data.ticket.id });
       }
+      if (data.action === "update" && shouldUpdateTicket(data.ticket) && data.ticket.status === status) {
+        if (data?.ticket) {
+          dispatch({
+            type: "UPDATE_TICKET",
+            payload: data.ticket,
+          });
+        }
+
+      }
+
+
 
       if (data.action === "delete") {
         dispatch({ type: "DELETE_TICKET", payload: data.ticketId });
@@ -254,16 +287,7 @@ const TicketsListCustom = (props) => {
     });
 
     socket.on(`company-${companyId}-appMessage`, (data) => {
-      const queueIds = queues.map((q) => q.id);
-      if (
-        profile === "user" &&
-        (queueIds.indexOf(data.ticket?.queue?.id) === -1 ||
-          data.ticket.queue === null)
-      ) {
-        return;
-      }
-
-      if (data.action === "create" && shouldUpdateTicket(data.ticket) && ( status === undefined || data.ticket.status === status)) {
+      if (data.action === "create" && shouldUpdateTicket(data.ticket) && (status === undefined || data.ticket.status === status)) {
         dispatch({
           type: "UPDATE_TICKET_UNREAD_MESSAGES",
           payload: data.ticket,

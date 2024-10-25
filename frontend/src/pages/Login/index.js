@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     },
     leftSide: {
         flex: 1,
-        backgroundImage: "url(https://liots.level10tech.com.br/PapelDeParedeInicial.png)",
+        backgroundImage: "/public/PapelDeParedeInicial.png",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         display: 'flex',
