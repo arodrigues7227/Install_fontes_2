@@ -1,7 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+
 import clsx from "clsx";
+import { toast } from "react-toastify";
+
 import { Paper, makeStyles } from "@material-ui/core";
+
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { ReplyMessageProvider } from "../../context/ReplyingMessage/ReplyingMessageContext";
 import { SocketContext } from "../../context/Socket/SocketContext";
@@ -14,7 +18,6 @@ import { TagsContainer } from "../TagsContainer";
 import TicketActionButtons from "../TicketActionButtonsCustom";
 import TicketHeader from "../TicketHeader";
 import TicketInfo from "../TicketInfo";
-import { toast } from "react-toastify";
 
 const drawerWidth = 320;
 
@@ -67,33 +70,30 @@ const Ticket = () => {
 
   const socketManager = useContext(SocketContext);
 
-  const fetchTicket = async () => {
-    try {
-      const { data } = await api.get("/tickets/u/" + ticketId);
-      const { queueId, contact } = data;
-      const { queues, profile } = user;
-      if (contact?.users?.map((u) => u.id).indexOf(user.id) === -1) {
-        const queueAllowed = queues.find((q) => q.id === queueId);
-        if (queueAllowed === undefined && profile !== "admin") {
-          toast.error("Acesso não permitido");
-          history.push("/tickets");
-          return;
-        }
-      }
-
-      setContact(data.contact);
-      setTicket(data);
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      toastError(err);
-    }
-  };
-
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
+      const fetchTicket = async () => {
+        try {
+          const { data } = await api.get("/tickets/u/" + ticketId);
+          const { queueId } = data;
+          const { queues, profile } = user;
 
+          const queueAllowed = queues.find((q) => q.id === queueId);
+          if (queueAllowed === undefined && profile !== "admin") {
+            toast.error("Acesso não permitido");
+            history.push("/tickets");
+            return;
+          }
+
+          setContact(data.contact);
+          setTicket(data);
+          setLoading(false);
+        } catch (err) {
+          setLoading(false);
+          toastError(err);
+        }
+      };
       fetchTicket();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
@@ -138,8 +138,6 @@ const Ticket = () => {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
-    fetchTicket();
-
   };
 
   const renderTicketInfo = () => {
@@ -188,7 +186,6 @@ const Ticket = () => {
       <ContactDrawer
         open={drawerOpen}
         handleDrawerClose={handleDrawerClose}
-        fetchTicket={fetchTicket}
         contact={contact}
         loading={loading}
         ticket={ticket}

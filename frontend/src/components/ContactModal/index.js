@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
 import * as Yup from "yup";
 import { Formik, FieldArray, Form, Field } from "formik";
 import { toast } from "react-toastify";
+
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
 import Button from "@material-ui/core/Button";
@@ -14,12 +16,11 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import CircularProgress from "@material-ui/core/CircularProgress";
+
 import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
-import AutocompleteMultipleUsers from "../AutocompleteMultipleUsers";
-import { AuthContext } from "../../context/Auth/AuthContext";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -71,8 +72,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	};
 
 	const [contact, setContact] = useState(initialState);
-	const [selectedUsers, setSelectedUsers] = useState([]);
-	const { user } = useContext(AuthContext);
+
 	useEffect(() => {
 		return () => {
 			isMounted.current = false;
@@ -85,7 +85,6 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 				setContact(prevState => {
 					return { ...prevState, ...initialValues };
 				});
-				setSelectedUsers(initialValues.users || []);
 			}
 
 			if (!contactId) return;
@@ -93,8 +92,8 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 			try {
 				const { data } = await api.get(`/contacts/${contactId}`);
 				if (isMounted.current) {
+					console.log(data)
 					setContact(data);
-					setSelectedUsers(data.users || []);
 				}
 			} catch (err) {
 				toastError(err);
@@ -111,12 +110,11 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
 	const handleSaveContact = async values => {
 		try {
-			const dataToSend = { ...values, users: selectedUsers };
 			if (contactId) {
-				await api.put(`/contacts/${contactId}`, dataToSend);
+				await api.put(`/contacts/${contactId}`, values);
 				handleClose();
 			} else {
-				const { data } = await api.post("/contacts", dataToSend);
+				const { data } = await api.post("/contacts", values);
 				if (onSave) {
 					onSave(data);
 				}
@@ -149,7 +147,6 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 				>
 					{({ values, errors, touched, isSubmitting }) => (
 						<Form>
-
 							<DialogContent dividers>
 								<Typography variant="subtitle1" gutterBottom>
 									{i18n.t("contactModal.form.mainInfo")}
@@ -175,41 +172,19 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 									variant="outlined"
 									margin="dense"
 								/>
-
-								{contact?.isGroup ? <>
-
-									{
-										selectedUsers?.length > 0 ? <>
-											<h3>Para que as mensagens de grupo funcione como ticket e entre em aguardando, é necessário remover todos os membros desta lista de usuários.</h3>
-										</> :
-
-											<h3>Ao adicionar membros, as mensagens de atendimento entrarão diretamente na aba atendendo e todos os usuários selecionados serão notificados.</h3>
-									}
-
-									<AutocompleteMultipleUsers
-										selectedUsers={selectedUsers}
-										onUsersChange={setSelectedUsers}
-										disabled={user?.profile !== "admin"}
+								<div>
+									<Field
+										as={TextField}
+										label={i18n.t("contactModal.form.email")}
+										name="email"
+										error={touched.email && Boolean(errors.email)}
+										helperText={touched.email && errors.email}
+										placeholder="Email address"
+										fullWidth
+										margin="dense"
+										variant="outlined"
 									/>
-
-
-								</> : <>
-									<div>
-										<Field
-											as={TextField}
-											label={i18n.t("contactModal.form.email")}
-											name="email"
-											error={touched.email && Boolean(errors.email)}
-											helperText={touched.email && errors.email}
-											placeholder="Email address"
-											fullWidth
-											margin="dense"
-											variant="outlined"
-										/>
-									</div>
-								</>}
-
-
+								</div>
 								<Typography
 									style={{ marginBottom: 8, marginTop: 12 }}
 									variant="subtitle1"
@@ -302,7 +277,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 					)}
 				</Formik>
 			</Dialog>
-		</div >
+		</div>
 	);
 };
 

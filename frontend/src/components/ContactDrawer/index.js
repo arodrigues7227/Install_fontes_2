@@ -16,15 +16,13 @@ import { i18n } from "../../translate/i18n";
 
 import ContactDrawerSkeleton from "../ContactDrawerSkeleton";
 import MarkdownWrapper from "../MarkdownWrapper";
-import { CardHeader, TextField } from "@material-ui/core";
+import { CardHeader } from "@material-ui/core";
 import { ContactForm } from "../ContactForm";
 import ContactModal from "../ContactModal";
 import { ContactNotes } from "../ContactNotes";
 
 import { generateColor } from "../../helpers/colorGenerator";
 import { getInitials } from "../../helpers/getInitials";
-import AutocompleteMultipleUsers from "../AutocompleteMultipleUsers";
-import { Field } from "formik";
 
 const drawerWidth = 320;
 
@@ -90,16 +88,15 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading, fetchTicket }) => {
+const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading }) => {
 	const classes = useStyles();
 
 	const [modalOpen, setModalOpen] = useState(false);
-	const [selectedUsers, setSelectedUsers] = useState([]);
+	const [openForm, setOpenForm] = useState(false);
 
 	useEffect(() => {
-		setSelectedUsers(contact?.users || []);
-	}, [contact]);
-
+		setOpenForm(false);
+	}, [open, contact]);
 
 	return (
 		<>
@@ -132,67 +129,48 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading, fetc
 					<div className={classes.content}>
 						<Paper square variant="outlined" className={classes.contactHeader}>
 							<CardHeader
-								onClick={() => { }}
+								onClick={() => {}}
 								style={{ cursor: "pointer", width: '100%' }}
 								titleTypographyProps={{ noWrap: true }}
 								subheaderTypographyProps={{ noWrap: true }}
 								avatar={<Avatar
-									src={contact.profilePicUrl}
-									alt="contact_image"
-									style={{ width: 60, height: 60, backgroundColor: generateColor(contact?.number), color: "white", fontWeight: "bold" }}
-								>
-									{getInitials(contact?.name)}
-								</Avatar>}
+                      src={contact.profilePicUrl}
+                      alt="contact_image"
+                      style={{ width: 60, height: 60, backgroundColor: generateColor(contact?.number), color: "white", fontWeight: "bold" }}
+                    >
+                      {getInitials(contact?.name)}
+                    </Avatar>}
 								title={
 									<>
-										<Typography >
+										<Typography onClick={() => setOpenForm(true)}>
 											{contact.name}
+											<CreateIcon style={{fontSize: 16, marginLeft: 5}} />
 										</Typography>
 									</>
 								}
 								subheader={
 									<>
-										<Typography style={{ fontSize: 12 }}>
+										<Typography style={{fontSize: 12}}>
 											<Link href={`tel:${contact.number}`}>{contact.number}</Link>
 										</Typography>
-										<Typography style={{ fontSize: 12 }}>
+										<Typography style={{fontSize: 12}}>
 											<Link href={`mailto:${contact.email}`}>{contact.email}</Link>
 										</Typography>
 									</>
 								}
 							/>
-							{contact?.isGroup ? <>
-								<Typography style={{ fontSize: 12 }}>Grupo</Typography>
-	
-								{
-									selectedUsers?.length > 0 ? <>
-										<Typography style={{ fontSize: 12 }}>Para que as mensagens de grupo funcione como ticket e entre em aguardando, é necessário remover todos os membros desta lista de usuários.</Typography>
-									</> :
-
-										<Typography style={{ fontSize: 12 }}>Ao adicionar membros, as mensagens de atendimento entrarão diretamente na aba atendendo e todos os usuários selecionados serão notificados.</Typography>
-								}
-
-								<AutocompleteMultipleUsers
-									disabled={true}
-									selectedUsers={selectedUsers}
-									onUsersChange={setSelectedUsers}
-								/>
-
-
-							</> : <>
-
-							</>}
 							<Button
 								variant="outlined"
 								color="primary"
-								onClick={() => setModalOpen(true)}
-								style={{ fontSize: 12 }}
+								onClick={() => setModalOpen(!openForm)}
+								style={{fontSize: 12}}
 							>
 								{i18n.t("contactDrawer.buttons.edit")}
 							</Button>
+							{(contact.id && openForm) && <ContactForm initialContact={contact} onCancel={() => setOpenForm(false)} />}
 						</Paper>
 						<Paper square variant="outlined" className={classes.contactDetails}>
-							<Typography variant="subtitle1" style={{ marginBottom: 10 }}>
+							<Typography variant="subtitle1" style={{marginBottom: 10}}>
 								{i18n.t("ticketOptionsMenu.appointmentsModal.title")}
 							</Typography>
 							<ContactNotes ticket={ticket} />
@@ -200,7 +178,7 @@ const ContactDrawer = ({ open, handleDrawerClose, contact, ticket, loading, fetc
 						<Paper square variant="outlined" className={classes.contactDetails}>
 							<ContactModal
 								open={modalOpen}
-								onClose={() => { setModalOpen(false); fetchTicket() }}
+								onClose={() => setModalOpen(false)}
 								contactId={contact.id}
 							></ContactModal>
 							<Typography variant="subtitle1">

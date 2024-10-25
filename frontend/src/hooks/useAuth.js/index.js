@@ -42,7 +42,6 @@ const useAuth = () => {
         if (data) {
           localStorage.setItem("token", JSON.stringify(data.token));
           api.defaults.headers.Authorization = `Bearer ${data.token}`;
-          setUser(data.user);
         }
         return api(originalRequest);
       }
@@ -81,10 +80,10 @@ const useAuth = () => {
           if (user && localStorage.getItem("token")) {
             try {
               const { data } = await api.post("/auth/refresh_token");
+              console.log("Running refresh Token" , new Date())
               if (data) {
                 localStorage.setItem("token", JSON.stringify(data.token));
                 api.defaults.headers.Authorization = `Bearer ${data.token}`;
-                setUser(data.user);
               }
 
             } catch (error) {
@@ -98,10 +97,15 @@ const useAuth = () => {
           * 3);
         return () => {
           clearInterval(interval)
+
         };
+
       }
     } catch (error) {
+
     }
+
+
   }, [user]);
 
   useEffect(() => {

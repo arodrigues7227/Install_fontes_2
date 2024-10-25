@@ -16,8 +16,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import UndoRoundedIcon from '@material-ui/icons/UndoRounded';
 import Tooltip from '@material-ui/core/Tooltip';
 import { green } from '@material-ui/core/colors';
-import { Badge } from "@mui/material";
-import GroupIcon from '@mui/icons-material/Group';
+
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -29,18 +28,6 @@ const useStyles = makeStyles(theme => ({
 			margin: theme.spacing(0.5),
 		},
 	},
-	connectionTag: {
-		background: "green",
-		color: "#FFF",
-		marginRight: 1,
-		padding: 1,
-		fontWeight: 'bold',
-		paddingLeft: 5,
-		paddingRight: 5,
-		borderRadius: 3,
-		fontSize: "0.8em",
-		whiteSpace: "nowrap"
-	  },
 }));
 
 const TicketActionButtonsCustom = ({ ticket }) => {
@@ -54,7 +41,7 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 
 	const customTheme = createTheme({
 		palette: {
-			primary: green,
+		  	primary: green,
 		}
 	});
 
@@ -91,44 +78,32 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 	};
 
 	return (
-
-		<>
-
-			{ticket?.contact?.isGroup && ticket?.contact?.users?.length > 0 ? <>
-				<div className={classes.actionButtons}>
-				<Tooltip title="Grupo Interno">
-                      <Badge style={{ backgroundColor: "blue" }} className={classes.connectionTag}><span style={{ fontSize: 11 }}><GroupIcon style={{ verticalAlign: "middle", fontSize: 16 }} /></span> </Badge>
-
-                    </Tooltip>
-				</div>
-			</> :
+		<div className={classes.actionButtons}>
+			{ticket.status === "closed" && (
+				<ButtonWithSpinner
+					loading={loading}
+					startIcon={<Replay />}
+					size="small"
+					onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
+				>
+					{i18n.t("messagesList.header.buttons.reopen")}
+				</ButtonWithSpinner>
+			)}
+			{ticket.status === "open" && (
 				<>
-					<div className={classes.actionButtons}>
-						{ticket.status === "closed" && (
-							<ButtonWithSpinner
-								loading={loading}
-								startIcon={<Replay />}
-								size="small"
-								onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
-							>
-								{i18n.t("messagesList.header.buttons.reopen")}
-							</ButtonWithSpinner>
-						)}
-						{ticket.status === "open" && (
-							<>
-								<Tooltip title={i18n.t("messagesList.header.buttons.return")}>
-									<IconButton onClick={e => handleUpdateTicketStatus(e, "pending", null)}>
-										<UndoRoundedIcon />
-									</IconButton>
-								</Tooltip>
-								<ThemeProvider theme={customTheme}>
-									<Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
-										<IconButton onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} color="primary">
-											<CheckCircleIcon />
-										</IconButton>
-									</Tooltip>
-								</ThemeProvider>
-								{/* <ButtonWithSpinner
+					<Tooltip title={i18n.t("messagesList.header.buttons.return")}>
+						<IconButton onClick={e => handleUpdateTicketStatus(e, "pending", null)}>
+							<UndoRoundedIcon />
+						</IconButton>
+					</Tooltip>
+					<ThemeProvider theme={customTheme}>
+						<Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
+							<IconButton onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} color="primary">
+								<CheckCircleIcon />
+							</IconButton>
+						</Tooltip>
+					</ThemeProvider>
+					{/* <ButtonWithSpinner
 						loading={loading}
 						startIcon={<Replay />}
 						size="small"
@@ -145,37 +120,29 @@ const TicketActionButtonsCustom = ({ ticket }) => {
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner> */}
-								<IconButton onClick={handleOpenTicketOptionsMenu}>
-									<MoreVert />
-								</IconButton>
-								<TicketOptionsMenu
-									ticket={ticket}
-									anchorEl={anchorEl}
-									menuOpen={ticketOptionsMenuOpen}
-									handleClose={handleCloseTicketOptionsMenu}
-								/>
-							</>
-						)}
-						{ticket.status === "pending" && (
-							<ButtonWithSpinner
-								loading={loading}
-								size="small"
-								variant="contained"
-								color="primary"
-								onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
-							>
-								{i18n.t("messagesList.header.buttons.accept")}
-							</ButtonWithSpinner>
-						)}
-					</div>
+					<IconButton onClick={handleOpenTicketOptionsMenu}>
+						<MoreVert />
+					</IconButton>
+					<TicketOptionsMenu
+						ticket={ticket}
+						anchorEl={anchorEl}
+						menuOpen={ticketOptionsMenuOpen}
+						handleClose={handleCloseTicketOptionsMenu}
+					/>
 				</>
-
-			}
-
-		</>
-
-
-
+			)}
+			{ticket.status === "pending" && (
+				<ButtonWithSpinner
+					loading={loading}
+					size="small"
+					variant="contained"
+					color="primary"
+					onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
+				>
+					{i18n.t("messagesList.header.buttons.accept")}
+				</ButtonWithSpinner>
+			)}
+		</div>
 	);
 };
 
