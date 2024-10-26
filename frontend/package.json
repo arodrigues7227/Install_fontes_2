@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "versionSystem": "5.4.0",
+  "versionSystem": "5.4.2",
   "nomeEmpresa": "Level10 Tech",
   "private": true,
   "dependencies": {
