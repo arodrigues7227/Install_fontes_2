@@ -338,7 +338,7 @@ const messages = {
           canDeleteTicket: "Permitido deletar Mensagem",
           canDeleteTicketEnabled: "Sim",
           canDeleteTicketDesabled: "Não",
-          allTicket: "Ticket Sem Fila/Aguardando [Invisível]",
+          allTicket: "Ticket Sem Fila [Invisível]",
           allTicketEnabled: "Habilitado",
           allTicketDesabled: "Desabilitado",
         },

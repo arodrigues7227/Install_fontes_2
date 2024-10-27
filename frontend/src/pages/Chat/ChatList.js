@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     height: "calc(100% - 58px)",
     overflow: "hidden",
     borderRadius: 0,
-    backgroundColor: theme.palette.boxlist, //DARK MODE LEVEL10 TECH//
+    backgroundColor: theme.palette.boxlist, //DARK MODE PLW DESIGN//
   },
   chatList: {
     display: "flex",

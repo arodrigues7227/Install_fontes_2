@@ -33,12 +33,12 @@ const useStyles = makeStyles((theme) => ({
     height: 240,
   },
   tab: {
-    backgroundColor: theme.palette.options,  //DARK MODE LEVEL10 TECH//
+    backgroundColor: theme.palette.options,  //DARK MODE PLW DESIGN//
     borderRadius: 4,
     width: "100%",
     "& .MuiTab-wrapper": {
       color: theme.palette.fontecor,
-    },   //DARK MODE LEVEL10 TECH//
+    },   //DARK MODE PLW DESIGN//
     "& .MuiTabs-flexContainer": {
       justifyContent: "center"
     }

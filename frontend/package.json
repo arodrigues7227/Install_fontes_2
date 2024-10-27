@@ -1,8 +1,8 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "versionSystem": "5.4.2",
-  "nomeEmpresa": "Level10 Tech",
+  "versionSystem": "5.2.6",
+  "nomeEmpresa": "PLW Design",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^2.14.0",

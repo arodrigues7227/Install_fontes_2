@@ -154,7 +154,7 @@ const TicketListItem = ({ ticket }) => {
         <Tooltip
           arrow
           placement="right"
-          title={ticket.queue?.name || "SEM FILA"}
+          title={ticket.queue?.name || "Sem fila"}
         >
           <span
             style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }}
