@@ -62,7 +62,7 @@
     "react-scripts": "3.4.3",
     "react-text-mask": "5.5.0",
     "react-toastify": "6.0.9",
-    "react-trello": "^.2.11",
+    "react-trello": ".2.11",
     "recharts": "2.12.7",
     "socket.io-client": "^4.7.5",
     "styled-components": "^5.3.5",
