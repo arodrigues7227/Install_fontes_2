@@ -62,7 +62,7 @@
     "react-scripts": "3.4.3",
     "react-text-mask": "5.5.0",
     "react-toastify": "6.0.9",
-    "react-trello": ".2.11",
+    "react-trello": "^2.2.11",
     "recharts": "2.12.7",
     "socket.io-client": "^4.7.5",
     "styled-components": "^5.3.5",
@@ -79,7 +79,8 @@
     "build": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false react-scripts build",
     "builddev": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && react-scripts build",
     "test": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && react-scripts test",
-    "eject": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && react-scripts eject"
+    "eject": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && react-scripts eject",
+    "build:dev": "GENERATE_SOURCEMAP=false react-scripts build"
   },
   "eslintConfig": {
     "extends": "react-app"
