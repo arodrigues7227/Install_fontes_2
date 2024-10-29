@@ -77,6 +77,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "14px",
     lineHeight: "1.4",
   },
+  // Botão que mostra o nome da Conexão na tela de Atendimento
+  // Botão , Conexão, Nome, Cor do botão
   connectionTag: {
     background: "green",
     color: "#FFF",
@@ -622,8 +624,8 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
             <>
               <ButtonWithSpinner
                 style={{
-                  backgroundColor: 'green',
-                  color: 'white',
+                  backgroundColor: 'white',
+                  color: 'green',
                   padding: '0px',
                   bottom: '17px',
                   borderRadius: '0px',
@@ -641,8 +643,8 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 
               <ButtonWithSpinner
                 style={{
-                  backgroundColor: 'red',
-                  color: 'white',
+                  backgroundColor: 'white',
+                  color: 'red',
                   padding: '0px',
                   bottom: '0px',
                   borderRadius: '0px',
@@ -664,8 +666,8 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
             <>
               <ButtonWithSpinner
                 style={{
-                  backgroundColor: 'green',
-                  color: 'white',
+                  backgroundColor: 'white',
+                  color: 'green',
                   padding: '0px',
                   bottom: '17px',
                   borderRadius: '0px',
@@ -683,8 +685,8 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 
               <ButtonWithSpinner
                 style={{
-                  backgroundColor: 'red',
-                  color: 'white',
+                  backgroundColor: 'white',
+                  color: 'red',
                   padding: '0px',
                   bottom: '0px',
                   borderRadius: '0px',
@@ -701,7 +703,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
               </ButtonWithSpinner>
             </>
           )}
-
+            
           {ticket.status !== "closed" && ticket.status !== "pending" && ticket.status !== "attending" && (
             <>
 
@@ -756,8 +758,8 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
           {ticket.status === "closed" && (
             <ButtonWithSpinner
               style={{
-                backgroundColor: 'red',
-                color: 'white',
+                backgroundColor: 'white',
+                color: 'red',
                 padding: '0px',
                 bottom: '0px',
                 borderRadius: '0px',
@@ -784,3 +786,5 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 };
 
 export default TicketListItemCustom;
+// Botões da Tela de atendimento 
+//Troca de Cores
