@@ -630,7 +630,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   bottom: '17px',
                   borderRadius: '0px',
                   left: '8px',
-                  fontSize: '0.6rem'
+                  fontSize: '0.7rem'
                 }}
                 variant="contained"
                 className={classes.acceptButton}
@@ -649,7 +649,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   bottom: '0px',
                   borderRadius: '0px',
                   left: '8px',
-                  fontSize: '0.6rem'
+                  fontSize: '0.7rem'
                 }}
                 variant="contained"
                 className={classes.acceptButton}
@@ -672,7 +672,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   bottom: '17px',
                   borderRadius: '0px',
                   left: '8px',
-                  fontSize: '0.6rem'
+                  fontSize: '0.7rem'
                 }}
                 variant="contained"
                 className={classes.acceptButton}
@@ -691,7 +691,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   bottom: '0px',
                   borderRadius: '0px',
                   left: '8px',
-                  fontSize: '0.6rem'
+                  fontSize: '0.7rem'
                 }}
                 variant="contained"
                 className={classes.acceptButton}
@@ -714,13 +714,13 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 
                   <ButtonWithSpinner
                     style={{
-                      backgroundColor: 'blue',
-                      color: 'white',
+                      backgroundColor: 'white',
+                      color: 'blue',
                       padding: '0px',
                       bottom: '17px',
                       borderRadius: '0px',
                       left: '8px',
-                      fontSize: '0.6rem'
+                      fontSize: '0.7rem'
                     }}
                     variant="contained"
                     className={classes.acceptButton}
@@ -732,13 +732,13 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                   </ButtonWithSpinner>
                   <ButtonWithSpinner
                     style={{
-                      backgroundColor: 'red',
-                      color: 'white',
+                      backgroundColor: 'white',
+                      color: 'red',
                       padding: '0px',
                       bottom: '0px',
                       borderRadius: '0px',
                       left: '8px',
-                      fontSize: '0.6rem'
+                      fontSize: '0.7rem'
                     }}
                     variant="contained"
                     className={classes.acceptButton}
@@ -764,7 +764,7 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
                 bottom: '0px',
                 borderRadius: '0px',
                 left: '8px',
-                fontSize: '0.6rem'
+                fontSize: '0.7rem'
               }}
               variant="contained"
               className={classes.acceptButton}
@@ -787,4 +787,5 @@ const TicketListItemCustom = ({ ticket, isNotification = false }) => {
 
 export default TicketListItemCustom;
 // Botões da Tela de atendimento 
-//Troca de Cores
+// Troca de Cores
+// Botão Reabrir, Botão Finalizar
