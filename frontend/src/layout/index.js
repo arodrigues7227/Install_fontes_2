@@ -54,11 +54,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.fancyBackground,
     '& .MuiButton-outlinedPrimary': {
       color: theme.mode === 'light' ? '#FFF' : '#FFF',
-	  backgroundColor: theme.mode === 'light' ? '#2DDD7F' : '#1c1c1c',
+	  backgroundColor: theme.mode === 'light' ? '#7ab0fa' : '#1c1c1c',
       //border: theme.mode === 'light' ? '1px solid rgba(0 124 102)' : '1px solid rgba(255, 255, 255, 0.5)',
     },
     '& .MuiTab-textColorPrimary.Mui-selected': {
-      color: theme.mode === 'light' ? '#2DDD7F' : '#FFF',
+      color: theme.mode === 'light' ? '#7ab0fa' : '#FFF',
     }
   },
   avatar: {
@@ -368,7 +368,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
       <AppBar
         position="absolute"
         className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}
-        color="primary"
+        color="#7ab0fa"
       >
         <Toolbar variant="dense" className={classes.toolbar}>
           <IconButton

@@ -112,7 +112,7 @@ const NewTicketModal = ({ modalOpen, onClose, initialContact }) => {
     return () => clearTimeout(delayDebounceFn);
   }, [searchParam, modalOpen]);
 
-  // const IconChannel = (channel) => {
+ // const IconChannel = (channel) => {
   //   switch (channel) {
   //     case "facebook":
   //       return <Facebook style={{ color: "#3b5998", verticalAlign: "middle" }} />;
