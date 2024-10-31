@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useContext, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+  useRef,
+} from "react";
 
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -37,7 +43,7 @@ import NewTicketModal from "../../components/NewTicketModal";
 import { SocketContext } from "../../context/Socket/SocketContext";
 import { generateColor } from "../../helpers/colorGenerator";
 import { getInitials } from "../../helpers/getInitials";
-import {CSVLink} from "react-csv";
+import { CSVLink } from "react-csv";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_CONTACTS") {
@@ -155,7 +161,7 @@ const Contacts = () => {
     return () => {
       socket.disconnect();
     };
-  }, [ socketManager]);
+  }, [socketManager]);
 
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
@@ -210,7 +216,7 @@ const Contacts = () => {
     setSearchParam("");
     setPageNumber(1);
   };
-  
+
   const handleimportContact = async () => {
     try {
       if (!!fileUploadRef.current.files[0]) {
@@ -229,26 +235,33 @@ const Contacts = () => {
       toastError(err);
     }
   };
-  
-function getDateLastMessage(contact) {
+
+  function getDateLastMessage(contact) {
     if (!contact) return null;
     if (!contact.tickets) return null;
 
     if (contact.tickets.length > 0) {
-        const date = new Date(contact.tickets[contact.tickets.length - 1].updatedAt);
+      const date = new Date(
+        contact.tickets[contact.tickets.length - 1].updatedAt
+      );
 
-        const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
-        const month = (date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : `0${date.getMonth() + 1}`;
-        const year = date.getFullYear().toString().slice(-2);
+      const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
+      const month =
+        date.getMonth() + 1 > 9
+          ? date.getMonth() + 1
+          : `0${date.getMonth() + 1}`;
+      const year = date.getFullYear().toString().slice(-2);
 
-        const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
-        const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
+      const hours =
+        date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
+      const minutes =
+        date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
 
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
     return null;
-}
+  }
 
   const loadMore = () => {
     setPageNumber((prevState) => prevState + 1);
@@ -321,15 +334,15 @@ function getDateLastMessage(contact) {
             {i18n.t("contacts.buttons.import")}
           </Button>
           <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            fileUploadRef.current.value = null;
-            fileUploadRef.current.click();
-          }}
-      >
-        {i18n.t("contacts.buttons.importSheet")}
-      </Button>
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              fileUploadRef.current.value = null;
+              fileUploadRef.current.click();
+            }}
+          >
+            {i18n.t("contacts.buttons.importSheet")}
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -338,12 +351,20 @@ function getDateLastMessage(contact) {
             {i18n.t("contacts.buttons.add")}
           </Button>
 
-         <CSVLink style={{ textDecoration:'none'}} separator=";" filename={'whaticket.csv'} data={contacts.map((contact) => ({ name: contact.name, number: contact.number, email: contact.email }))}>
-          <Button	variant="contained" color="primary"> 
-          EXPORTAR CONTATOS 
-          </Button>
-          </CSVLink>		  
-
+          <CSVLink
+            style={{ textDecoration: "none" }}
+            separator=";"
+            filename={"whaticket.csv"}
+            data={contacts.map((contact) => ({
+              name: contact.name,
+              number: contact.number,
+              email: contact.email,
+            }))}
+          >
+            <Button variant="contained" color="primary">
+              EXPORTAR CONTATOS
+            </Button>
+          </CSVLink>
         </MainHeaderButtonsWrapper>
       </MainHeader>
       <Paper
@@ -353,15 +374,15 @@ function getDateLastMessage(contact) {
       >
         <>
           <input
-              style={{ display: "none" }}
-              id="upload"
-              name="file"
-              type="file"
-              accept=".xls,.xlsx"
-              onChange={() => {
-                setConfirmOpen(true);
-              }}
-              ref={fileUploadRef}
+            style={{ display: "none" }}
+            id="upload"
+            name="file"
+            type="file"
+            accept=".xls,.xlsx"
+            onChange={() => {
+              setConfirmOpen(true);
+            }}
+            ref={fileUploadRef}
           />
         </>
         <Table size="small">
@@ -375,10 +396,9 @@ function getDateLastMessage(contact) {
               <TableCell align="center">
                 {i18n.t("contacts.table.email")}
               </TableCell>
-              <TableCell align="center">
-              {"Última Interação"}
-              </TableCell>
-			  <TableCell align="center">{"Status"}</TableCell>
+              <TableCell align="center">{"Última Interação"}</TableCell>
+              <TableCell align="center">{"Origem"}</TableCell>
+              <TableCell align="center">{"Status"}</TableCell>
               <TableCell align="center">
                 {i18n.t("contacts.table.actions")}
               </TableCell>
@@ -389,31 +409,38 @@ function getDateLastMessage(contact) {
               {contacts.map((contact) => (
                 <TableRow key={contact.id}>
                   <TableCell style={{ paddingRight: 0 }}>
-                    { <Avatar
-                      style={{ backgroundColor: generateColor(contact?.number), fontWeight: "bold", color: "white" }}
-                      src={contact.profilePicUrl}>
-                      {getInitials(contact?.name)}
-                    </Avatar>}
+                    {
+                      <Avatar
+                        style={{
+                          backgroundColor: generateColor(contact?.number),
+                          fontWeight: "bold",
+                          color: "white",
+                        }}
+                        src={contact.profilePicUrl}
+                      >
+                        {getInitials(contact?.name)}
+                      </Avatar>
+                    }
                   </TableCell>
                   <TableCell>{contact.name}</TableCell>
                   <TableCell align="center">{contact.number}</TableCell>
                   <TableCell align="center">{contact.email}</TableCell>
-                                    <TableCell align="center">
-                                        {getDateLastMessage(contact)}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        {contact.active ? (
-                                            <CheckCircleIcon
-                                                style={{ color: "green" }}
-                                                fontSize="small"
-                                            />
-                                        ) : (
-                                            <CancelIcon
-                                                style={{ color: "red" }}
-                                                fontSize="small"
-                                            />
-                                        )}
-                                    </TableCell>
+                  <TableCell align="center">
+                    {getDateLastMessage(contact)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {contact?.whatsapp ? contact?.whatsapp.name : ""}
+                  </TableCell>
+                  <TableCell align="center">
+                    {contact.active ? (
+                      <CheckCircleIcon
+                        style={{ color: "green" }}
+                        fontSize="small"
+                      />
+                    ) : (
+                      <CancelIcon style={{ color: "red" }} fontSize="small" />
+                    )}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"

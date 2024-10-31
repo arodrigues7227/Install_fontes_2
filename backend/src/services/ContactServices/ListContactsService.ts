@@ -1,6 +1,7 @@
 import { Sequelize, Op } from "sequelize";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
+import Whatsapp from "../../models/Whatsapp";
 
 interface Request {
   searchParam?: string;
@@ -22,8 +23,8 @@ const ListContactsService = async ({
   const whereCondition = {
     [Op.or]: [
       {
-        name: Sequelize.where(
-          Sequelize.fn("LOWER", Sequelize.col("name")),
+        "Contact.name": Sequelize.where(
+          Sequelize.fn("LOWER", Sequelize.col("Contact.name")),
           "LIKE",
           `%${searchParam.toLowerCase().trim()}%`
         )
@@ -34,6 +35,7 @@ const ListContactsService = async ({
       [Op.eq]: companyId
     }
   };
+
   const limit = 30;
   const offset = limit * (+pageNumber - 1);
 
@@ -45,10 +47,15 @@ const ListContactsService = async ({
         model: Ticket,
         as: "tickets",
         attributes: ["id", "status", "createdAt", "updatedAt"]
+      },
+      {
+        model: Whatsapp,
+        as: "whatsapp",
+        attributes: ["id", "name", "isDefault"]
       }
     ],
     offset,
-    order: [["name", "ASC"]]
+    order: [[Sequelize.col("Contact.name"), "ASC"]]
   });
 
   const hasMore = count > offset + contacts.length;

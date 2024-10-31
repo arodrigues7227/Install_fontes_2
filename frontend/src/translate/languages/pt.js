@@ -136,6 +136,7 @@ const messages = {
           sendIdQueue: "Fila",
           timeSendQueue: "Redirecionar para fila em X minutos",
           importOldMessagesEnable: "Importar mensagens antigas",
+          autoImportContacts: "Importar contatos automaticamente",
           queueRedirection: "Redirecionamento de Fila",
           outOfHoursMessage: "Mensagem de fora de expediente",
           queueRedirectionDesc: "Selecione uma fila para os contatos que não possuem fila serem redirecionados",

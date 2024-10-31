@@ -15,6 +15,7 @@ import Whatsapp from "../../models/Whatsapp";
 import { logger } from "../../utils/logger";
 import createOrUpdateBaileysService from "../BaileysServices/CreateOrUpdateBaileysService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import CreateOrUpdateContactService from "../ContactServices/CreateOrUpdateContactService";
 
 type Session = WASocket & {
   id?: number;
@@ -89,7 +90,7 @@ const wbotMonitor = async (
           });
 
 
-          if(ticket.status === "closed") {
+          if (ticket.status === "closed") {
             await ticket.update({
               status: "pending",
             });
@@ -101,6 +102,41 @@ const wbotMonitor = async (
     });
 
     wbot.ev.on("contacts.upsert", async (contacts: BContact[]) => {
+
+      if (whatsapp.autoImportContacts) {
+        await Promise.all(
+          contacts.map(async contact => {
+
+            let profilePicUrl;
+
+            if (contact.imgUrl === "") {
+              profilePicUrl = "";
+            } else {
+              try {
+                profilePicUrl = await wbot.profilePictureUrl(contact.id, "image");
+              } catch (e) {
+                Sentry.captureException(e);
+                profilePicUrl = `${process.env.FRONTEND_URL}/nopicture.png`;
+              }
+            }
+
+            const isGroup = contact.id.endsWith("@g.us") ? true : false;
+            const name = contact.name ? contact.name : contact.id.replace(/\D/g, "");
+
+            const contactData = {
+              name: name,
+              number: isGroup ? contact.id.replace("@g.us", "") : contact.id.replace(/\D/g, ""),
+              isGroup,
+              companyId: companyId,
+              profilePicUrl,
+              whatsappId: wbot.id
+            }
+
+            await CreateOrUpdateContactService(contactData)
+
+          })
+        );
+      }
 
       await createOrUpdateBaileysService({
         whatsappId: whatsapp.id,
